@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+build
+dist
+target
+*.wasm
+public/contracts
+Cargo.lock
+bun.lock
+package-lock.json
