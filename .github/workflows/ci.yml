@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Lint + typecheck + frontend build ─────────────────────
+  frontend:
+    name: Frontend (lint, typecheck, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_STELLAR_RPC_URL: https://soroban-testnet.stellar.org
+          NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE: "Test SDF Network ; September 2015"
+          NEXT_PUBLIC_STELLAR_HORIZON_URL: https://horizon-testnet.stellar.org
+          NEXT_PUBLIC_STELLAR_EXPLORER_URL: https://stellar.expert/explorer/testnet
+
+  # ── Soroban contract — check + test + WASM build ──────────
+  contract:
+    name: Contract (check, test, wasm build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Add wasm32 target
+        run: rustup target add wasm32v1-none
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            eventpot_contract/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('eventpot_contract/Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+
+      - name: cargo check
+        run: npm run contract:check
+
+      - name: cargo test
+        run: npm run contract:test
+
+      - name: cargo build (release wasm)
+        run: npm run contract:build
+
+      - name: Sync wasm to public/contracts
+        run: npm run wasm:sync
+
+      - name: Upload built wasm
+        uses: actions/upload-artifact@v4
+        with:
+          name: eventpot-contract-wasm
+          path: public/contracts/eventpot_contract.wasm
+          if-no-files-found: error
+          retention-days: 7

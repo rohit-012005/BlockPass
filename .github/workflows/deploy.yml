@@ -1,0 +1,73 @@
+name: Deploy Contract (Testnet)
+
+on:
+  workflow_dispatch:
+    inputs:
+      deployer_secret:
+        description: 'Stellar Testnet deployer secret key (S…)'
+        required: true
+        type: string
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Testnet
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            eventpot_contract/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('eventpot_contract/Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build wasm
+        run: npm run contract:build
+
+      - name: Deploy
+        env:
+          STELLAR_DEPLOYER_SECRET: ${{ inputs.deployer_secret }}
+        run: npm run contract:deploy
+
+      - name: Write back contract id
+        run: |
+          set -euo pipefail
+          ID=$(grep '^NEXT_PUBLIC_EVENTPOT_CONTRACT_ID=' .env.local | cut -d= -f2)
+          if [ -z "$ID" ]; then
+            echo "No contract id found in .env.local"; exit 1
+          fi
+          echo "Deployed contract: $ID"
+          echo "NEXT_PUBLIC_EVENTPOT_CONTRACT_ID=$ID" >> $GITHUB_OUTPUT
+        id: meta
+
+      - name: Upload deployment summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eventpot-deployment
+          path: .env.local
+          if-no-files-found: ignore
+          retention-days: 14
