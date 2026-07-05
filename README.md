@@ -2,59 +2,133 @@
 
 > Collect ticket money for a small event on Stellar. Refund everyone automatically if you cancel.
 
-BlockPass is a Next.js + Soroban app for event ticketing with escrow, refunds, and QR check-in. The user story is simple: sell tickets, keep funds locked until the event is resolved, refund cleanly on cancel, and let organizers check in buyers at the door.
+BlockPass is a Next.js + Soroban app for event ticketing with escrow, refunds, and QR check-in.
+The product idea came from a simple problem: independent event organizers need a low-cost way to
+collect payments, manage cancellations, and issue refunds without manual coordination.
 
-## Overview
+EventPot was the original problem statement name. The product name is now BlockPass, but the
+underlying use case is the same: ticket payments stay in escrow until the event is completed, and
+if the event is canceled, attendees get refunded automatically.
 
-| Item | Details |
+## 1. Problem
+
+Independent event organizers often face friction when collecting payments, managing cancellations,
+and issuing refunds. Traditional ticketing platforms charge significant service fees, while direct
+UPI or bank transfers force organizers to manually process refunds when plans change.
+
+BlockPass removes that friction with a blockchain escrow flow. Ticket payments stay locked until
+the event is successfully completed. If an event is canceled, attendees receive refunds
+automatically without requiring manual intervention from the organizer.
+
+## 2. Why Stellar?
+
+BlockPass uses Stellar because it gives the product the properties this use case needs:
+
+| Stellar Property | Why It Matters |
 |---|---|
-| Product | Event ticketing with escrow + atomic refunds |
-| Frontend | Next.js 15, React 19, TypeScript |
-| Wallets | `@creit.tech/stellar-wallets-kit` |
-| Contract | Soroban Rust contract in `blockpass_contract/` |
-| Network | Stellar Testnet |
-| CI | Lint, typecheck, contract check/test, wasm build |
-| Deploy | `scripts/deploy-contract.mjs` |
+| Fast finality | Ticket purchases and refunds settle in seconds, which keeps the event flow responsive |
+| Low fees | Small events can’t afford heavy platform fees or expensive on-chain actions |
+| Native USDC support | Ticket pricing can stay stable and predictable |
+| Soroban smart contracts | Escrow, refunds, and organizer payouts can be encoded transparently on chain |
+| Micro-payment fit | Ticket sales and partial refunds are a natural fit for Stellar’s payment model |
 
-## What It Does
+## 3. Target Audience
 
-| Flow | Result |
+BlockPass is designed for:
+
+| Audience | Use Case |
 |---|---|
-| Organizer creates event | Event enters sales flow |
-| Buyer buys ticket | Funds go to contract escrow |
-| Organizer cancels | All active buyers are refunded atomically |
-| Organizer confirms | Remaining balance goes to organizer |
-| Door scan | QR token is verified, then ticket is checked in on chain |
+| Independent organizers | Workshops, meetups, house parties, comedy nights, local performances |
+| Communities and clubs | Paid gatherings with simple ticket collection |
+| Student groups | Event participation fees and campus activities |
+| Travel and reunion planners | Small groups collecting money before an event |
+| Small event operators | A lower-cost alternative to centralized ticketing platforms |
 
-## Architecture
+## 4. System Architecture
 
-| Layer | What Lives There |
+### Frontend
+
+The web app includes:
+
+| Frontend Area | What It Does |
 |---|---|
-| UI | Pages, forms, dashboard, ticket views, scanner |
-| Shared UI | Buttons, cards, loading states, copy/share helpers |
-| Hooks | Wallet state, fetch hooks, telemetry |
-| App API | Event reads, ticket reads, QR verify, telemetry, OG image |
-| Contract | Soroban business logic for sales, refunds, confirm, check-in |
-| Deployment | Build/sync/deploy scripts for contract wasm and env wiring |
+| Event creation | Organizers create and publish events |
+| Public event page | Buyers purchase tickets and organizers manage the event |
+| Organizer dashboard | Organizers see event status and key actions |
+| Ticket dashboard | Users see purchased tickets and QR entry passes |
+| Check-in scanner | Organizers verify QR tokens at the door |
 
-### Request Flow
+### Soroban Smart Contract
 
-1. Browser loads Next.js UI.
-2. UI reads data from app routes or contract-backed helpers.
-3. Wallet signs on-chain transactions.
-4. Contract executes escrow/refund/check-in logic.
-5. Telemetry captures page and action events for basic monitoring.
+Core contract functions:
 
-### Main Pages
-
-| Route | Purpose |
+| Contract Method | Purpose |
 |---|---|
-| `/` | Landing page and product overview |
-| `/create` | Organizer event creation |
-| `/event/[id]` | Public event page, buy/manage/share |
-| `/me/tickets` | Wallet-owned tickets and QR codes |
-| `/organizer/dashboard` | Organizer summary and event list |
-| `/scan/[eventId]` | Door QR verification and check-in |
+| `create_event()` | Create and publish a new event |
+| `buy_ticket()` | Buy a ticket and deposit funds into escrow |
+| `confirm_event()` | Release funds to the organizer after success |
+| `cancel_event()` | Refund all active tickets on cancellation |
+| `refund_ticket()` | Allow self-service refund before cutoff |
+| `check_in()` | Mark a ticket as used at the venue |
+| `get_event()` | Read event state |
+| `get_ticket()` | Read ticket state |
+
+### Workflow
+
+1. An organizer creates and publishes an event.
+2. A shareable event link is distributed to attendees.
+3. Participants purchase tickets, and funds are deposited into smart-contract escrow.
+4. If the event succeeds, the organizer confirms it and receives the escrowed funds.
+5. If the event is canceled, ticket holders receive automatic refunds through the contract.
+6. Eligible attendees can request self-service refunds before the refund deadline.
+7. QR-based tickets are scanned during entry for secure attendance verification.
+
+## 5. Technical Challenges
+
+Key engineering concerns in this product:
+
+| Challenge | Why It Matters |
+|---|---|
+| Automated refunds | Every active ticket must be refunded cleanly without leaving funds stuck |
+| Refund deadlines | On-chain timestamps enforce the refund window reliably |
+| Capacity control | Overselling has to be prevented even under concurrent purchase pressure |
+| QR authenticity | Check-in tokens need to be verifiable and hard to forge |
+| Seat reassignment | Refunds can reopen inventory, so the UX has to stay consistent |
+| Anchor compatibility | Future fiat on/off ramp support can expand the product beyond native token flows |
+
+## 6. Product Roadmap
+
+### MVP
+
+| MVP Feature | Status in Repo |
+|---|---|
+| Event creation and ticket sales | Implemented |
+| Smart-contract escrow | Implemented |
+| Event confirmation and cancellation | Implemented |
+| Self-service attendee refunds | Implemented |
+| Organizer dashboard and ticket tracking | Implemented |
+| Smart-contract testing and validation | Implemented |
+
+### Growth & Adoption
+
+| Growth Idea | Why It Helps |
+|---|---|
+| Shareable event links | Makes it easy to promote events on social channels |
+| Under-a-minute setup | Reduces onboarding friction for organizers |
+| Lightweight QR check-in | Improves real-world usability at the venue |
+| Public discovery feed | Helps attendees find events without a separate channel |
+
+### Long-Term Vision
+
+| Future Feature | Value |
+|---|---|
+| Fiat ticket purchases via Stellar Anchors | Broadens adoption beyond crypto-native users |
+| Recurring and duplicated events | Helps organizers reuse event templates |
+| Multiple ticket categories | Supports VIP, student, and general admission |
+| On-chain attendance records | Creates a foundation for certificates and reputation credentials |
+
+BlockPass aims to be a transparent, low-cost, decentralized alternative to traditional event
+ticketing platforms while keeping the organizer and attendee experience simple.
 
 ## Quick Start
 
