@@ -263,6 +263,32 @@ label {
   transition: width 200ms ease;
 }
 
+.skeleton {
+  background: linear-gradient(90deg, #1c1c26 25%, #2a2a36 37%, #1c1c26 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 999px;
+}
+
+.skeleton-title {
+  height: 2rem;
+  width: min(420px, 80%);
+}
+
+.skeleton-line {
+  height: 0.9rem;
+  width: 100%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
 .notice {
   border: 1px solid var(--border);
   background: var(--bg-elev-2);
