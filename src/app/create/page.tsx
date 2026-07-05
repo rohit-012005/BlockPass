@@ -6,7 +6,7 @@ import { useWallet } from '@/hooks/useWallet'
 import { createEvent } from '@/lib/contract'
 import { CONTRACT_ERRORS } from '@/types'
 import { NETWORK, isValidStellarAddress, shortAddress } from '@/lib/stellar'
-import { slugify } from '@/lib/format'
+import { formatTokenAmount, slugify } from '@/lib/format'
 
 interface FormState {
   title: string
@@ -249,8 +249,32 @@ export default function CreateEventPage() {
           </div>
         )}
       </form>
+
+      {(form.title || form.venue || form.date) && (
+        <section className="card stack">
+          <h2 className="h2">Live preview</h2>
+          <p className="muted" style={{ margin: 0 }}>
+            Review title, venue, price, and dates before you submit.
+          </p>
+          <div className="grid-2">
+            <PreviewStat label="Title" value={form.title || 'Untitled event'} />
+            <PreviewStat label="Venue" value={form.venue || 'Venue pending'} />
+            <PreviewStat label="Price" value={`${formatTokenAmount(BigInt(Math.round(Number(form.price || 0) * 10_000_000)), 7)} XLM`} />
+            <PreviewStat label="Capacity" value={form.capacity || '0'} />
+          </div>
+          <div className="muted">
+            Starts {formatDatePreview(form.date, form.time)} · refunds close{' '}
+            {formatDatePreview(form.refundCutoffDate, form.refundCutoffTime)}
+          </div>
+        </section>
+      )}
     </div>
   )
+}
+
+function formatDatePreview(date: string, time: string): string {
+  if (!date || !time) return 'when dates are filled'
+  return `${date} at ${time}`
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -258,6 +282,19 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div>
       <label>{label}</label>
       {children}
+    </div>
+  )
+}
+
+function PreviewStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <div className="muted" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        {label}
+      </div>
+      <div className="mono" style={{ marginTop: '0.25rem' }}>
+        {value}
+      </div>
     </div>
   )
 }
