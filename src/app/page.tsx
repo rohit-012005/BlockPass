@@ -22,7 +22,7 @@ export default async function HomePage() {
           Sell tickets. Cancel cleanly. Refund everyone in one transaction.
         </h1>
         <p className="muted" style={{ maxWidth: 640, fontSize: '1.05rem' }}>
-          Event Pot is a small, no-fee way to collect ticket money for a small event. Money sits
+          BlockPass is a small, no-fee way to collect ticket money for a small event. Money sits
           in a Soroban contract until the event. If the organizer cancels, every buyer is
           refunded automatically — no manual UPI reversals, no chasing anyone.
         </p>

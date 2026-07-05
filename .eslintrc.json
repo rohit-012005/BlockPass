@@ -6,5 +6,5 @@
     "no-console": ["warn", { "allow": ["warn", "error", "info"] }],
     "@next/next/no-img-element": "off"
   },
-  "ignorePatterns": ["node_modules/", ".next/", "eventpot_contract/target/", "public/contracts/*.wasm"]
+  "ignorePatterns": ["node_modules/", ".next/", "blockpass_contract/target/", "public/contracts/*.wasm"]
 }

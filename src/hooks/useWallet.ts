@@ -67,9 +67,9 @@ export function useWallet(): UseWalletState {
   useEffect(() => {
     if (!isBrowser()) return
     try {
-      const stored = window.localStorage.getItem('eventpot:wallet-address')
+      const stored = window.localStorage.getItem('blockpass:wallet-address')
       if (stored) setAddress(stored)
-      const wid = window.localStorage.getItem('eventpot:wallet-id')
+      const wid = window.localStorage.getItem('blockpass:wallet-id')
       if (wid) setWalletId(wid)
     } catch {
       // ignore
@@ -80,11 +80,11 @@ export function useWallet(): UseWalletState {
     if (!isBrowser()) return
     try {
       if (addr && wid) {
-        window.localStorage.setItem('eventpot:wallet-address', addr)
-        window.localStorage.setItem('eventpot:wallet-id', wid)
+        window.localStorage.setItem('blockpass:wallet-address', addr)
+        window.localStorage.setItem('blockpass:wallet-id', wid)
       } else {
-        window.localStorage.removeItem('eventpot:wallet-address')
-        window.localStorage.removeItem('eventpot:wallet-id')
+        window.localStorage.removeItem('blockpass:wallet-address')
+        window.localStorage.removeItem('blockpass:wallet-id')
       }
     } catch {
       // ignore

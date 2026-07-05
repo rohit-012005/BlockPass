@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Copy the freshly built `eventpot_contract.wasm` from the Rust target
+ * Copy the freshly built `blockpass_contract.wasm` from the Rust target
  * directory into `public/contracts/` so the Next.js dev server can
  * serve it (e.g. for the README link, or for a future pure-browser
  * deploy flow).
@@ -18,13 +18,13 @@ const __dirname = dirname(__filename)
 const projectRoot = resolve(__dirname, '..')
 const source = resolve(
   projectRoot,
-  'eventpot_contract',
+  'blockpass_contract',
   'target',
   'wasm32v1-none',
   'release',
-  'eventpot_contract.wasm',
+  'blockpass_contract.wasm',
 )
-const destination = resolve(projectRoot, 'public', 'contracts', 'eventpot_contract.wasm')
+const destination = resolve(projectRoot, 'public', 'contracts', 'blockpass_contract.wasm')
 
 await mkdir(dirname(destination), { recursive: true })
 await copyFile(source, destination)

@@ -49,8 +49,8 @@ impl Setup {
         for b in [&buyer_a, &buyer_b, &buyer_c] {
             mint(&issuer, b, 10_000);
         }
-        let contract = env.register(EventPotContract, ());
-        let client = EventPotContractClient::new(&env, &contract);
+        let contract = env.register(BlockPassContract, ());
+        let client = BlockPassContractClient::new(&env, &contract);
         let id = client.create_event(
             &organizer,
             &String::from_str(&env, "Rooftop comedy night"),
@@ -105,7 +105,7 @@ where
 #[test]
 fn create_event_starts_on_sale() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let event = client.get_event(&s.contract_id);
     assert_eq!(event.status, status::ON_SALE);
     assert_eq!(event.sold, 0);
@@ -122,8 +122,8 @@ fn rejects_empty_title() {
     let admin = Address::generate(&env);
     let organizer = Address::generate(&env);
     let (asset, _t, _i) = make_token(&env, &admin);
-    let contract = env.register(EventPotContract, ());
-    let client = EventPotContractClient::new(&env, &contract);
+    let contract = env.register(BlockPassContract, ());
+    let client = BlockPassContractClient::new(&env, &contract);
     let res = client.try_create_event(
         &organizer,
         &String::from_str(&env, ""),
@@ -147,8 +147,8 @@ fn rejects_zero_capacity() {
     let admin = Address::generate(&env);
     let organizer = Address::generate(&env);
     let (asset, _t, _i) = make_token(&env, &admin);
-    let contract = env.register(EventPotContract, ());
-    let client = EventPotContractClient::new(&env, &contract);
+    let contract = env.register(BlockPassContract, ());
+    let client = BlockPassContractClient::new(&env, &contract);
     let res = client.try_create_event(
         &organizer,
         &String::from_str(&env, "t"),
@@ -172,8 +172,8 @@ fn rejects_zero_price() {
     let admin = Address::generate(&env);
     let organizer = Address::generate(&env);
     let (asset, _t, _i) = make_token(&env, &admin);
-    let contract = env.register(EventPotContract, ());
-    let client = EventPotContractClient::new(&env, &contract);
+    let contract = env.register(BlockPassContract, ());
+    let client = BlockPassContractClient::new(&env, &contract);
     let res = client.try_create_event(
         &organizer,
         &String::from_str(&env, "t"),
@@ -192,7 +192,7 @@ fn rejects_zero_price() {
 #[test]
 fn rejects_cutoff_after_start() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let res = client.try_create_event(
         &s.organizer,
         &String::from_str(&s.env, "t"),
@@ -211,7 +211,7 @@ fn rejects_cutoff_after_start() {
 #[test]
 fn buy_ticket_transfers_and_increments() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let token = s.token();
     let tid = client.buy_ticket(&s.buyer_a, &s.contract_id);
     let ticket = client.get_ticket(&tid);
@@ -228,7 +228,7 @@ fn buy_ticket_transfers_and_increments() {
 #[test]
 fn sold_out_after_capacity() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let _ = client.buy_ticket(&s.buyer_a, &s.contract_id);
     let _ = client.buy_ticket(&s.buyer_b, &s.contract_id);
     let _ = client.buy_ticket(&s.buyer_c, &s.contract_id);
@@ -241,7 +241,7 @@ fn sold_out_after_capacity() {
 #[test]
 fn cannot_buy_when_not_on_sale() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     client.close_sales(&s.organizer, &s.contract_id);
     let res = client.try_buy_ticket(&s.buyer_a, &s.contract_id);
     assert_contract_error(&res, ContractError::EventNotOnSale);
@@ -250,7 +250,7 @@ fn cannot_buy_when_not_on_sale() {
 #[test]
 fn self_refund_before_cutoff() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let token = s.token();
     let tid = client.buy_ticket(&s.buyer_a, &s.contract_id);
     client.refund_ticket(&s.buyer_a, &tid);
@@ -265,7 +265,7 @@ fn self_refund_before_cutoff() {
 #[test]
 fn self_refund_after_cutoff_blocked() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let tid = client.buy_ticket(&s.buyer_a, &s.contract_id);
     s.env.ledger().with_mut(|l| {
         l.timestamp = 1_700_000_000 + 5 * 86_400 + 1;
@@ -277,7 +277,7 @@ fn self_refund_after_cutoff_blocked() {
 #[test]
 fn only_owner_can_self_refund() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let tid = client.buy_ticket(&s.buyer_a, &s.contract_id);
     let res = client.try_refund_ticket(&s.buyer_b, &tid);
     assert_contract_error(&res, ContractError::NotTicketOwner);
@@ -286,7 +286,7 @@ fn only_owner_can_self_refund() {
 #[test]
 fn cancel_event_refunds_everyone_atomically() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let token = s.token();
     let _ = client.buy_ticket(&s.buyer_a, &s.contract_id);
     let _ = client.buy_ticket(&s.buyer_b, &s.contract_id);
@@ -311,7 +311,7 @@ fn cancel_event_refunds_everyone_atomically() {
 #[test]
 fn cancel_after_partial_refunds_only_active() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let token = s.token();
     let ta = client.buy_ticket(&s.buyer_a, &s.contract_id);
     client.buy_ticket(&s.buyer_b, &s.contract_id);
@@ -328,7 +328,7 @@ fn cancel_after_partial_refunds_only_active() {
 #[test]
 fn confirm_event_pays_organizer() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let token = s.token();
     let _ = client.buy_ticket(&s.buyer_a, &s.contract_id);
     let _ = client.buy_ticket(&s.buyer_b, &s.contract_id);
@@ -343,7 +343,7 @@ fn confirm_event_pays_organizer() {
 #[test]
 fn confirm_after_refund_pays_only_active() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let token = s.token();
     let ta = client.buy_ticket(&s.buyer_a, &s.contract_id);
     let _ = client.buy_ticket(&s.buyer_b, &s.contract_id);
@@ -357,7 +357,7 @@ fn confirm_after_refund_pays_only_active() {
 #[test]
 fn non_organizer_cannot_confirm() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let _ = client.buy_ticket(&s.buyer_a, &s.contract_id);
     let res = client.try_confirm_event(&s.buyer_a, &s.contract_id);
     assert_contract_error(&res, ContractError::NotOrganizer);
@@ -366,7 +366,7 @@ fn non_organizer_cannot_confirm() {
 #[test]
 fn check_in_marks_ticket() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let tid = client.buy_ticket(&s.buyer_a, &s.contract_id);
     client.check_in(&s.organizer, &tid);
     let ticket = client.get_ticket(&tid);
@@ -378,7 +378,7 @@ fn check_in_marks_ticket() {
 #[test]
 fn cannot_checkin_after_refund() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let tid = client.buy_ticket(&s.buyer_a, &s.contract_id);
     client.refund_ticket(&s.buyer_a, &tid);
     let res = client.try_check_in(&s.organizer, &tid);
@@ -388,7 +388,7 @@ fn cannot_checkin_after_refund() {
 #[test]
 fn only_organizer_can_checkin() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let tid = client.buy_ticket(&s.buyer_a, &s.contract_id);
     let res = client.try_check_in(&s.buyer_b, &tid);
     assert_contract_error(&res, ContractError::NotOrganizer);
@@ -397,7 +397,7 @@ fn only_organizer_can_checkin() {
 #[test]
 fn refund_reopens_sold_out() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let _ = client.buy_ticket(&s.buyer_a, &s.contract_id);
     let tb = client.buy_ticket(&s.buyer_b, &s.contract_id);
     let _ = client.buy_ticket(&s.buyer_c, &s.contract_id);
@@ -410,7 +410,7 @@ fn refund_reopens_sold_out() {
 #[test]
 fn list_buyer_tickets_returns_all() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     client.buy_ticket(&s.buyer_a, &s.contract_id);
     client.buy_ticket(&s.buyer_a, &s.contract_id);
     let tickets = client.list_buyer_tickets(&s.buyer_a);
@@ -420,7 +420,7 @@ fn list_buyer_tickets_returns_all() {
 #[test]
 fn list_organizer_events_returns_all() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let _ = client.create_event(
         &s.organizer,
         &String::from_str(&s.env, "Second show"),
@@ -440,14 +440,14 @@ fn list_organizer_events_returns_all() {
 #[test]
 fn version_string() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
-    assert_eq!(client.version(), String::from_str(&s.env, "eventpot-0.1.0"));
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
+    assert_eq!(client.version(), String::from_str(&s.env, "blockpass-0.1.0"));
 }
 
 #[test]
 fn get_unknown_event_errors() {
     let s = Setup::new();
-    let client = EventPotContractClient::new(&s.env, &s.contract);
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
     let res = client.try_get_event(&99999u64);
     assert_contract_error(&res, ContractError::EventNotFound);
 }

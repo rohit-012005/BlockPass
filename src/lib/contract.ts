@@ -30,7 +30,7 @@ export function getContractId(override?: string): string {
   const id = override ?? CONTRACT_ID
   if (!id) {
     throw new Error(
-      'NEXT_PUBLIC_EVENTPOT_CONTRACT_ID is not set. Set it in .env.local or pass an override.',
+      'NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID is not set. Set it in .env.local or pass an override.',
     )
   }
   return id

@@ -37,8 +37,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            eventpot_contract/target
-          key: cargo-${{ runner.os }}-${{ hashFiles('eventpot_contract/Cargo.lock') }}
+            blockpass_contract/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('blockpass_contract/Cargo.lock') }}
           restore-keys: cargo-${{ runner.os }}-
 
       - name: Install dependencies
@@ -55,19 +55,19 @@ jobs:
       - name: Write back contract id
         run: |
           set -euo pipefail
-          ID=$(grep '^NEXT_PUBLIC_EVENTPOT_CONTRACT_ID=' .env.local | cut -d= -f2)
+          ID=$(grep '^NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=' .env.local | cut -d= -f2)
           if [ -z "$ID" ]; then
             echo "No contract id found in .env.local"; exit 1
           fi
           echo "Deployed contract: $ID"
-          echo "NEXT_PUBLIC_EVENTPOT_CONTRACT_ID=$ID" >> $GITHUB_OUTPUT
+          echo "NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=$ID" >> $GITHUB_OUTPUT
         id: meta
 
       - name: Upload deployment summary
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: eventpot-deployment
+          name: blockpass-deployment
           path: .env.local
           if-no-files-found: ignore
           retention-days: 14

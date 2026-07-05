@@ -6,11 +6,11 @@ import { isTestnet, NETWORK } from '@/lib/stellar'
 import { CONTRACT_ID } from '@/lib/stellar'
 
 export const metadata: Metadata = {
-  title: 'Event Pot — collect tickets on Stellar',
+  title: 'BlockPass — collect tickets on Stellar',
   description:
     'A simple way to collect ticket money for a small event on Stellar, with automatic refunds if you cancel.',
   openGraph: {
-    title: 'Event Pot',
+    title: 'BlockPass',
     description: 'Collect ticket money on Stellar. Refund automatically on cancel.',
     type: 'website',
   },
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="container row" style={{ justifyContent: 'space-between', padding: '1rem 1.5rem' }}>
           <div className="row" style={{ gap: '1.25rem' }}>
             <Link href="/" style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--text)' }}>
-              🎟 Event Pot
+              BlockPass
             </Link>
             <Link href="/create" className="muted">
               Create event

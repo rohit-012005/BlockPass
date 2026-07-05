@@ -1,9 +1,9 @@
-# 🎟 Event Pot
+# BlockPass
 
 > Collect ticket money for a small event on Stellar. Refund everyone
 > automatically if you cancel.
 
-Event Pot is a Next.js + Soroban app that solves one boring real-world
+BlockPass is a Next.js + Soroban app that solves one boring real-world
 problem: **what happens to the ticket money if the rooftop comedy night
 gets rained out?** Instead of manually reversing 30 UPI payments, the
 organizer calls `cancel_event` and the contract does 30 SAC transfers
@@ -13,7 +13,7 @@ in a single transaction.
 
 - **Frontend** — Next.js 15 (App Router) · React 19 · TypeScript
 - **Wallet** — `@creit.tech/stellar-wallets-kit` (Freighter, xBull, Lobstr, Albedo, Rabet)
-- **Contract** — Soroban (Rust, `no_std`) — `eventpot_contract/`
+- **Contract** — Soroban (Rust, `no_std`) — `blockpass_contract/`
 - **CI** — GitHub Actions: lint, typecheck, contract test, wasm build
 - **Deploy** — `scripts/deploy-contract.mjs` (Testnet)
 
@@ -51,7 +51,7 @@ export CHECKIN_SIGNING_SECRET=$(openssl rand -hex 32)
 npm run contract:deploy
 ```
 
-The deploy script writes `NEXT_PUBLIC_EVENTPOT_CONTRACT_ID=…` to
+The deploy script writes `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=…` to
 `.env.local` automatically.
 
 ## Layout
@@ -69,7 +69,7 @@ src/
   hooks/                # wallet, data fetching
   lib/                  # stellar, contract, format, signing
   types/                # shared types (event/ticket/error)
-eventpot_contract/      # Soroban contract (Rust)
+blockpass_contract/     # Soroban contract (Rust)
 scripts/                # sync-wasm, deploy-contract
 public/contracts/       # built wasm (gitignored)
 .github/workflows/      # CI + deploy

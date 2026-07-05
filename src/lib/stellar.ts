@@ -46,7 +46,7 @@ export function isTestnet(): boolean {
   return NETWORK.networkPassphrase === STELLAR_TESTNET.networkPassphrase
 }
 
-export const CONTRACT_ID: string = readEnv('NEXT_PUBLIC_EVENTPOT_CONTRACT_ID', '')
+export const CONTRACT_ID: string = readEnv('NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID', '')
 
 export function explorerAccountUrl(address: string): string {
   return `${NETWORK.explorerUrl}/account/${address}`
@@ -72,4 +72,3 @@ export function isValidStellarAddress(address: string): boolean {
 export function isValidStellarContractId(id: string): boolean {
   return /^C[A-Z2-7]{55}$/.test(id)
 }
-

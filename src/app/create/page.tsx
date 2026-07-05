@@ -218,7 +218,7 @@ export default function CreateEventPage() {
         </div>
         <div className="muted">
           Network: {NETWORK.networkPassphrase}. The contract id your client will call is
-          configured via <span className="kbd">NEXT_PUBLIC_EVENTPOT_CONTRACT_ID</span>.
+          configured via <span className="kbd">NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID</span>.
         </div>
         {address && (
           <div className="muted">

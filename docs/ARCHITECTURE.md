@@ -1,8 +1,8 @@
-# Event Pot — Architecture
+# BlockPass — Architecture
 
 ## Overview
 
-Event Pot is a small two-tier app: a **Next.js (App Router) + TypeScript**
+BlockPass is a small two-tier app: a **Next.js (App Router) + TypeScript**
 frontend, and a **Soroban smart contract** that holds ticket money in
 escrow and refunds atomically on cancel.
 
@@ -21,14 +21,14 @@ escrow and refunds atomically on cancel.
                 │ simulateTransaction             │ submit signed tx
                 ▼                                 │
 ┌──────────────────────────────────────────────────────────────────┐
-│   Stellar Soroban RPC  ────►  Event Pot Contract (Rust)          │
+│   Stellar Soroban RPC  ────►  BlockPass Contract (Rust)          │
 │   • SAC transfer_in (buy_ticket)                                  │
 │   • SAC transfer_out (refund_ticket / cancel_event)              │
 │   • SAC transfer_out (confirm_event → organizer)                 │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-## Soroban Contract (`eventpot_contract/`)
+## Soroban Contract (`blockpass_contract/`)
 
 | Method | Auth | Purpose |
 |---|---|---|

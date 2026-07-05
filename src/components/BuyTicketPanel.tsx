@@ -58,7 +58,7 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
     <div className="card stack">
       <h2 className="h2">Buy a ticket</h2>
       <p className="muted">
-        Funds are held in the Event Pot contract and refunded automatically if the organizer
+        Funds are held in the BlockPass contract and refunded automatically if the organizer
         cancels.
       </p>
       <div className="row" style={{ justifyContent: 'space-between' }}>

@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(deprecated)]
 
-//! # Event Pot — Soroban Contract
+//! # BlockPass — Soroban Contract
 //!
 //! Collects ticket money for a small event and atomically refunds all
 //! buyers if the organizer cancels. Built on top of the Stellar Asset
@@ -285,10 +285,10 @@ fn env_timestamp(env: &Env) -> u64 {
 // ─────────────────────────── contract ─────────────────────────
 
 #[contract]
-pub struct EventPotContract;
+pub struct BlockPassContract;
 
 #[contractimpl]
-impl EventPotContract {
+impl BlockPassContract {
     // ─────────── create_event ───────────
 
     /// Create a new event in `OnSale` state. The organizer is the only
@@ -709,7 +709,7 @@ impl EventPotContract {
     /// Returns a contract version string, used by the UI to surface a
     /// "running contract v…" indicator and by clients to detect drift.
     pub fn version(_env: Env) -> String {
-        String::from_str(&_env, "eventpot-0.1.0")
+        String::from_str(&_env, "blockpass-0.1.0")
     }
 }
 

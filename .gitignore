@@ -36,11 +36,11 @@ yarn-error.log*
 
 # cargo test snapshots
 /contract_snapshots
-/eventpot_contract/test_snapshots
+/blockpass_contract/test_snapshots
 
 # rust / soroban
-eventpot_contract/target
-eventpot_contract/Cargo.lock
+blockpass_contract/target
+blockpass_contract/Cargo.lock
 *.wasm
 !public/contracts/.gitkeep
 

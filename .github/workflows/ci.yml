@@ -62,8 +62,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            eventpot_contract/target
-          key: cargo-${{ runner.os }}-${{ hashFiles('eventpot_contract/Cargo.lock') }}
+            blockpass_contract/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('blockpass_contract/Cargo.lock') }}
           restore-keys: cargo-${{ runner.os }}-
 
       - name: cargo check
@@ -81,7 +81,7 @@ jobs:
       - name: Upload built wasm
         uses: actions/upload-artifact@v4
         with:
-          name: eventpot-contract-wasm
-          path: public/contracts/eventpot_contract.wasm
+          name: blockpass-contract-wasm
+          path: public/contracts/blockpass_contract.wasm
           if-no-files-found: error
           retention-days: 7

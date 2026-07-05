@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Deploy the Event Pot Soroban contract to Stellar Testnet.
+ * Deploy the BlockPass Soroban contract to Stellar Testnet.
  *
  * 1. Builds the wasm if missing.
  * 2. Uploads the wasm via `Operation.uploadContractWasm`.
@@ -17,7 +17,7 @@
  * Optional env vars:
  *   STELLAR_RPC_URL
  *   STELLAR_NETWORK_PASSPHRASE
- *   EVENTPOT_WASM_PATH
+ *   BLOCKPASS_WASM_PATH
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -44,14 +44,14 @@ const rpcUrl = process.env.STELLAR_RPC_URL || 'https://soroban-testnet.stellar.o
 const networkPassphrase =
   process.env.STELLAR_NETWORK_PASSPHRASE || Networks.TESTNET
 const wasmPath =
-  process.env.EVENTPOT_WASM_PATH ||
+  process.env.BLOCKPASS_WASM_PATH ||
   path.resolve(
     projectRoot,
-    'eventpot_contract',
+    'blockpass_contract',
     'target',
     'wasm32v1-none',
     'release',
-    'eventpot_contract.wasm',
+    'blockpass_contract.wasm',
   )
 
 function fail(message) {
@@ -154,7 +154,7 @@ function ensureWasm() {
     [
       'build',
       '--manifest-path',
-      path.resolve(projectRoot, 'eventpot_contract', 'Cargo.toml'),
+      path.resolve(projectRoot, 'blockpass_contract', 'Cargo.toml'),
       '--target',
       'wasm32v1-none',
       '--release',
@@ -170,12 +170,12 @@ function writeEnvLocal(contractId) {
   const envPath = path.resolve(projectRoot, '.env.local')
   let body = ''
   if (fs.existsSync(envPath)) body = fs.readFileSync(envPath, 'utf8')
-  const re = /^NEXT_PUBLIC_EVENTPOT_CONTRACT_ID=.*$/m
+  const re = /^NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=.*$/m
   const next = re.test(body)
-    ? body.replace(re, `NEXT_PUBLIC_EVENTPOT_CONTRACT_ID=${contractId}`)
-    : `${body}${body && !body.endsWith('\n') ? '\n' : ''}NEXT_PUBLIC_EVENTPOT_CONTRACT_ID=${contractId}\n`
+    ? body.replace(re, `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=${contractId}`)
+    : `${body}${body && !body.endsWith('\n') ? '\n' : ''}NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=${contractId}\n`
   fs.writeFileSync(envPath, next)
-  log('env', `Wrote NEXT_PUBLIC_EVENTPOT_CONTRACT_ID=${contractId} to .env.local`)
+  log('env', `Wrote NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=${contractId} to .env.local`)
 }
 
 async function main() {

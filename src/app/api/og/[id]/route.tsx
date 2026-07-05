@@ -33,7 +33,7 @@ export async function GET(_request: Request, ctx: Ctx) {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: '#ff5e7e', fontSize: 28, fontWeight: 700 }}>
-          🎟 Event Pot
+          BlockPass
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', marginTop: 40, flex: 1 }}>
           <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1.1 }}>{event.title}</div>

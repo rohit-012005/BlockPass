@@ -26,9 +26,9 @@ const RPC_URL = process.env.NEXT_PUBLIC_STELLAR_RPC_URL ?? NETWORK.rpcUrl
 const PASSPHRASE = process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE ?? NETWORK.networkPassphrase
 
 function readContractId(): string {
-  const id = process.env.NEXT_PUBLIC_EVENTPOT_CONTRACT_ID
+  const id = process.env.NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID
   if (!id) {
-    throw new Error('NEXT_PUBLIC_EVENTPOT_CONTRACT_ID is not set on the server.')
+    throw new Error('NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID is not set on the server.')
   }
   return id
 }

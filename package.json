@@ -1,8 +1,8 @@
 {
-  "name": "event-pot",
+  "name": "blockpass",
   "version": "0.1.0",
   "private": true,
-  "description": "Event Pot — collect ticket money for a small event on Stellar with automatic refunds on cancel.",
+  "description": "BlockPass — collect ticket money for a small event on Stellar with automatic refunds on cancel.",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -14,10 +14,10 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "node --test tests/*.test.mjs",
-    "contract:check": "cargo check --manifest-path eventpot_contract/Cargo.toml",
-    "contract:test": "cargo test --manifest-path eventpot_contract/Cargo.toml",
-    "contract:build": "cargo build --manifest-path eventpot_contract/Cargo.toml --target wasm32v1-none --release",
-    "contract:fmt": "cargo fmt --manifest-path eventpot_contract/Cargo.toml --all",
+    "contract:check": "cargo check --manifest-path blockpass_contract/Cargo.toml",
+    "contract:test": "cargo test --manifest-path blockpass_contract/Cargo.toml",
+    "contract:build": "cargo build --manifest-path blockpass_contract/Cargo.toml --target wasm32v1-none --release",
+    "contract:fmt": "cargo fmt --manifest-path blockpass_contract/Cargo.toml --all",
     "wasm:sync": "node scripts/sync-wasm.mjs",
     "contract:deploy": "node scripts/deploy-contract.mjs",
     "ci": "npm run lint && npm run typecheck && npm run contract:check && npm run contract:test"

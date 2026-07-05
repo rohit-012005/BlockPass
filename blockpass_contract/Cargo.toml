@@ -1,8 +1,8 @@
 [package]
-name = "eventpot_contract"
+name = "blockpass_contract"
 version = "0.1.0"
 edition = "2021"
-description = "Event Pot — Stellar ticket escrow with atomic batch refund"
+description = "BlockPass — Stellar ticket escrow with atomic batch refund"
 license = "MIT"
 
 [lib]

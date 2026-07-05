@@ -1,5 +1,5 @@
 /**
- * Shared types for the Event Pot frontend.
+ * Shared types for the BlockPass frontend.
  *
  * These mirror the Soroban contract's on-chain shapes. Numbers are
  * exposed as JS `number` (safe for our domain: event ids, ticket

@@ -78,7 +78,7 @@ function MyTicketsInner() {
       {justId && <div className="notice notice-success">You just bought ticket #{justId}.</div>}
       {!CONTRACT_ID && (
         <div className="notice notice-error">
-          No contract id is configured. Set <span className="kbd">NEXT_PUBLIC_EVENTPOT_CONTRACT_ID</span>.
+          No contract id is configured. Set <span className="kbd">NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID</span>.
         </div>
       )}
       {tickets.isLoading && <p className="muted">Loading…</p>}
