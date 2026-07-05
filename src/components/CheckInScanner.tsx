@@ -39,6 +39,11 @@ export function CheckInScanner({ eventId, onCheckIn }: Props) {
         body: JSON.stringify({ token: code.trim(), eventId }),
       })
       const data = (await res.json()) as VerifyResult
+      if (data.ok && data.payload && data.payload.event_id !== eventId) {
+        setVerify(null)
+        setError(`Token is for event #${data.payload.event_id}, not this door.`)
+        return
+      }
       setVerify(data)
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to verify')
@@ -63,6 +68,13 @@ export function CheckInScanner({ eventId, onCheckIn }: Props) {
     }
   }
 
+  const onReset = () => {
+    setCode('')
+    setVerify(null)
+    setError(null)
+    setSuccess(null)
+  }
+
   return (
     <div className="card stack">
       <h2 className="h2">Door check-in</h2>
@@ -80,6 +92,9 @@ export function CheckInScanner({ eventId, onCheckIn }: Props) {
         <button className="btn btn-ghost" onClick={onVerify} disabled={busy || !code.trim()}>
           Verify token
         </button>
+        <button className="btn btn-ghost" onClick={onReset} disabled={busy && !code.trim()}>
+          Reset
+        </button>
         {verify?.ok && verify.payload && (
           <button className="btn btn-success" onClick={onConfirm} disabled={busy}>
             Check in ticket #{verify.payload.ticket_id}
@@ -89,7 +104,7 @@ export function CheckInScanner({ eventId, onCheckIn }: Props) {
       {verify && !verify.ok && <div className="notice notice-error">Invalid: {verify.error}</div>}
       {verify?.ok && verify.payload && (
         <div className="notice">
-          Valid token — ticket #{verify.payload.ticket_id} for buyer{' '}
+          Valid token for event #{verify.payload.event_id} - ticket #{verify.payload.ticket_id} for buyer{' '}
           <span className="mono">{verify.payload.buyer}</span>
         </div>
       )}
