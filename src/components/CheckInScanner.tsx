@@ -76,8 +76,16 @@ export function CheckInScanner({ eventId, onCheckIn }: Props) {
   }
 
   return (
-    <div className="card stack">
-      <h2 className="h2">Door check-in</h2>
+    <div className="stack">
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <div>
+          <span className="eyebrow">Scanner</span>
+          <h2 className="h2" style={{ marginTop: '0.6rem' }}>
+            Door check-in
+          </h2>
+        </div>
+        <span className="tag tag-accent">Event #{eventId}</span>
+      </div>
       <p className="muted">
         Paste or scan a ticket QR token. The server validates the HMAC signature before the
         on-chain <span className="mono">check_in</span> call goes through.
@@ -104,7 +112,7 @@ export function CheckInScanner({ eventId, onCheckIn }: Props) {
       {verify && !verify.ok && <div className="notice notice-error">Invalid: {verify.error}</div>}
       {verify?.ok && verify.payload && (
         <div className="notice">
-          Valid token for event #{verify.payload.event_id} - ticket #{verify.payload.ticket_id} for buyer{' '}
+          Valid token for event #{verify.payload.event_id} · ticket #{verify.payload.ticket_id} for buyer{' '}
           <span className="mono">{verify.payload.buyer}</span>
         </div>
       )}

@@ -26,8 +26,11 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
 
   if (!canBuy) {
     return (
-      <div className="card stack">
-        <h2 className="h2">Tickets unavailable</h2>
+      <div className="stack">
+        <span className="eyebrow">Tickets</span>
+        <h2 className="h2" style={{ marginTop: '0.4rem' }}>
+          Tickets unavailable
+        </h2>
         <p className="muted">This event is not currently accepting ticket purchases.</p>
         <span className="tag tag-warning">Status code: {status}</span>
       </div>
@@ -64,22 +67,34 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
   }
 
   return (
-    <div className="card stack">
-      <h2 className="h2">Buy a ticket</h2>
+    <div className="stack">
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <div>
+          <span className="eyebrow">Checkout</span>
+          <h2 className="h2" style={{ marginTop: '0.5rem' }}>
+            Buy a ticket
+          </h2>
+        </div>
+        <span className="tag tag-success">Open</span>
+      </div>
       <p className="muted">
         Funds are held in the BlockPass contract and refunded automatically if the organizer
         cancels.
       </p>
-      <div className="row" style={{ justifyContent: 'space-between' }}>
-        <span className="muted">Price</span>
-        <span className="mono">{price.toString()} (raw units)</span>
+      <div className="notice">
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <span className="muted">Price</span>
+          <span className="mono">{price.toString()} (raw units)</span>
+        </div>
       </div>
       {stats.data && (
-        <div className="row" style={{ justifyContent: 'space-between' }}>
-          <span className="muted">Remaining</span>
-          <span className="mono">
-            {Math.max(0, stats.data.capacity - stats.data.sold)} / {stats.data.capacity}
-          </span>
+        <div className="notice">
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <span className="muted">Remaining</span>
+            <span className="mono">
+              {Math.max(0, stats.data.capacity - stats.data.sold)} / {stats.data.capacity}
+            </span>
+          </div>
         </div>
       )}
       {address === organizer && (

@@ -6,9 +6,9 @@ BlockPass is a Next.js + Soroban app for event ticketing with escrow, refunds, a
 The product idea came from a simple problem: independent event organizers need a low-cost way to
 collect payments, manage cancellations, and issue refunds without manual coordination.
 
-EventPot was the original problem statement name. The product name is now BlockPass, but the
-underlying use case is the same: ticket payments stay in escrow until the event is completed, and
-if the event is canceled, attendees get refunded automatically.
+BlockPass is the current product name. The underlying use case is the same: ticket payments stay
+in escrow until the event is completed, and if the event is canceled, attendees get refunded
+automatically.
 
 ## 1. Problem
 
@@ -153,9 +153,9 @@ The deploy script writes `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=…` to `.env.local`
 
 | Field | Value |
 |---|---|
-| Contract ID | `CASNRSLYQQ26YUCGFXTV7AGHV7NBFMEY42E6CYNL6ZQGT5EFZPXAHKV7` |
-| Deployment tx | `feaf73de28d49ee48f61a378260ddd94080303d77083ac83667bd9854e1540c8` |
-| Explorer contract link | `https://stellar.expert/explorer/testnet/contract/CASNRSLYQQ26YUCGFXTV7AGHV7NBFMEY42E6CYNL6ZQGT5EFZPXAHKV7` |
+| Contract ID | `CDX2ZOLDJRPN7ZWC2LRTODWAXE7XEIODRCMBSXKAF7ZH4Q5SDLTWD4TA` |
+| Deployment tx | `8d91c537aa9c0e9161fb5609064a81469081ebf5139bf6083ffbf8d55c8a94a5` |
+| Explorer contract link | `https://stellar.expert/explorer/testnet/contract/CDX2ZOLDJRPN7ZWC2LRTODWAXE7XEIODRCMBSXKAF7ZH4Q5SDLTWD4TA` |
 | Network | `Stellar Testnet` |
 | Deployer account | `GAM66NWFLWHLDYEIX7XRJYVQK7MVV7ZFQ2F4IXYCCKAUHY5XR6QGC2LV` |
 | Contract version | `blockpass-0.1.0` |

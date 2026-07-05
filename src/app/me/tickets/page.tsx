@@ -63,9 +63,10 @@ function MyTicketsInner() {
 
   if (!address) {
     return (
-      <div className="card stack">
-        <h1 className="h1">My tickets</h1>
-        <p className="muted">Connect a wallet to see the tickets you own.</p>
+      <div className="hero stack">
+        <span className="eyebrow">Buyer dashboard</span>
+        <h1 className="h1">Your tickets live here.</h1>
+        <p className="lead">Connect a wallet to see what you bought, open QR codes, and manage refunds.</p>
         <button className="btn btn-primary" onClick={connect} style={{ alignSelf: 'flex-start' }}>
           Connect wallet
         </button>
@@ -75,8 +76,27 @@ function MyTicketsInner() {
 
   return (
     <div className="stack">
-      <h1 className="h1">My tickets</h1>
-      {justId && <div className="notice notice-success">You just bought ticket #{justId}.</div>}
+      <section className="hero reveal">
+        <div className="hero-grid">
+          <div className="hero-copy stack">
+            <span className="eyebrow">My tickets</span>
+            <h1 className="h1">Everything you own in one view.</h1>
+            <p className="lead">
+              Keep QR codes, event details, and refund-ready states visible without jumping across
+              pages.
+            </p>
+            {justId && <div className="notice notice-success">You just bought ticket #{justId}.</div>}
+          </div>
+          <div className="surface feature-card stack floating">
+            <span className="tag tag-accent">Wallet connected</span>
+            <div className="divider" />
+            <MiniTicketStat label="Tickets" value={String(tickets.data?.length ?? 0)} />
+            <MiniTicketStat label="Active" value={String(tickets.data?.filter((t) => t.state === TICKET_STATE.SOLD).length ?? 0)} />
+            <MiniTicketStat label="Checked in" value={String(tickets.data?.filter((t) => t.state === TICKET_STATE.CHECKED_IN).length ?? 0)} />
+          </div>
+        </div>
+      </section>
+
       {!CONTRACT_ID && (
         <div className="notice notice-error">
           No contract id is configured. Set <span className="kbd">NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID</span>.
@@ -85,8 +105,11 @@ function MyTicketsInner() {
       {tickets.isLoading && <p className="muted">Loading…</p>}
       {tickets.error && <div className="notice notice-error">{tickets.error}</div>}
       {tickets.data && tickets.data.length === 0 && (
-        <div className="card stack">
-          <h2 className="h2">Nothing yet</h2>
+        <div className="surface stack">
+          <span className="eyebrow">Empty state</span>
+          <h2 className="h2" style={{ marginTop: '0.5rem' }}>
+            Nothing yet
+          </h2>
           <p className="muted">You don&apos;t own any tickets. Find an event to attend:</p>
           <Link href="/" className="btn btn-ghost" style={{ alignSelf: 'flex-start' }}>
             Browse events
@@ -94,7 +117,7 @@ function MyTicketsInner() {
         </div>
       )}
       {tickets.data && tickets.data.length > 0 && (
-        <div className="grid-2">
+        <div className="surface-grid">
           {tickets.data.map((t) => (
             <TicketCard
               key={t.id}
@@ -126,7 +149,7 @@ function TicketCard({
     ? `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrPayload)}`
     : null
   return (
-    <div className="card stack">
+    <div className="surface stack">
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <span
           className={`tag ${
@@ -184,6 +207,17 @@ function TicketCard({
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+function MiniTicketStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="card" style={{ padding: '1rem' }}>
+      <div className="stat-label">{label}</div>
+      <div className="mono" style={{ marginTop: '0.35rem', fontSize: '1.1rem' }}>
+        {value}
+      </div>
     </div>
   )
 }

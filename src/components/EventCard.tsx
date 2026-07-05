@@ -29,7 +29,7 @@ export function EventCard({ event }: Props) {
   })()
 
   return (
-    <Link href={`/event/${event.id}`} className="card" style={{ display: 'block', color: 'inherit' }}>
+    <Link href={`/event/${event.id}`} className="surface" style={{ display: 'block', color: 'inherit' }}>
       <div className="row" style={{ justifyContent: 'space-between' }}>
         {statusTag}
         <span className="muted">{formatUnixDateTime(event.starts_at)}</span>

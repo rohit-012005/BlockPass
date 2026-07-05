@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useWallet } from '@/hooks/useWallet'
 import { CheckInScanner } from '@/components/CheckInScanner'
@@ -18,20 +18,27 @@ export default function ScanPage({ params: _params }: Props) {
   const [organizer, setOrganizer] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  // resolve eventId from dynamic route at mount
-  void (async () => {
-    try {
-      const { eventId: eid } = await _params
-      const id = Number(eid)
-      if (Number.isFinite(id) && id > 0) {
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      try {
+        const { eventId: eid } = await _params
+        const id = Number(eid)
+        if (!Number.isFinite(id) || id <= 0) return
+        if (cancelled) return
         setEventId(id)
         const ev = await serverGetEvent(id)
-        if (ev) setOrganizer(ev.organizer)
+        if (!cancelled && ev) setOrganizer(ev.organizer)
+      } catch (e) {
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : 'Failed to load event')
+        }
       }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load event')
+    })()
+    return () => {
+      cancelled = true
     }
-  })()
+  }, [_params])
 
   const onCheckIn = useCallback(
     async (ticketId: number) => {
@@ -49,14 +56,76 @@ export default function ScanPage({ params: _params }: Props) {
     return <div className="notice notice-error">{error}</div>
   }
   if (eventId == null) {
-    return <p className="muted">Loading event…</p>
-  }
-  if (organizer && address && organizer !== address) {
     return (
-      <div className="notice notice-error">
-        This wallet is not the organizer of event #{eventId}. Switch to the organizer&apos;s wallet.
+      <div className="hero stack">
+        <span className="eyebrow">Check-in</span>
+        <h1 className="h1">Loading event…</h1>
+        <p className="lead">Preparing door validation, organizer identity, and QR token checks.</p>
       </div>
     )
   }
-  return <CheckInScanner eventId={eventId} organizer={organizer ?? ''} onCheckIn={onCheckIn} />
+  if (organizer && address && organizer !== address) {
+    return (
+      <div className="hero stack">
+        <span className="eyebrow">Access denied</span>
+        <h1 className="h1">Wrong wallet for this door.</h1>
+        <p className="lead">
+          This wallet is not the organizer of event #{eventId}. Switch to the organizer&apos;s wallet.
+        </p>
+      </div>
+    )
+  }
+  return (
+    <section className="hero reveal">
+      <div className="hero-grid">
+        <div className="hero-copy stack">
+          <span className="eyebrow">Door mode</span>
+          <h1 className="h1">Scan, verify, and check people in without friction.</h1>
+          <p className="lead">
+            Paste a QR token or scan one from the camera flow. The server validates the signature
+            before the on-chain check-in goes through.
+          </p>
+          <div className="row">
+            <span className="tag tag-accent">Event #{eventId}</span>
+            {organizer && <span className="tag">Organizer ready</span>}
+          </div>
+        </div>
+        <div className="surface feature-card stack floating">
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <span className="muted">Wallet</span>
+            {address ? <span className="tag tag-success">Connected</span> : <span className="tag tag-warning">Required</span>}
+          </div>
+          <div className="divider" />
+          {address ? (
+            <div className="mono">{address}</div>
+          ) : (
+            <button className="btn btn-primary" onClick={connect}>
+              Connect wallet
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="surface-grid">
+        <div className="surface span-7 stack">
+          <CheckInScanner eventId={eventId} organizer={organizer ?? ''} onCheckIn={onCheckIn} />
+        </div>
+        <div className="surface span-5 stack">
+          <span className="eyebrow">Door notes</span>
+          <div className="stack">
+            <div className="notice">
+              Verify token first, then confirm check-in. That keeps the flow safe at busy doors.
+            </div>
+            <div className="notice">
+              If a token belongs to a different event, the scanner blocks it before any on-chain
+              action.
+            </div>
+            <div className="notice notice-success">
+              You can reuse this page on desktop or a tablet at the venue.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }

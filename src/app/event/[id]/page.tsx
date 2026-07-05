@@ -31,59 +31,95 @@ export default async function EventPage({ params }: Params) {
 
   return (
     <div className="stack">
-      <section className="card">
-        <div className="row" style={{ justifyContent: 'space-between' }}>
-          <span className="tag tag-accent">{eventStatusLabel(event.status)}</span>
-          <Link href="/" className="muted">
-            ← All events
-          </Link>
-        </div>
-        <h1 className="h1" style={{ marginTop: '0.5rem' }}>{event.title}</h1>
-        <p className="muted">{event.venue} · {formatUnixDateTime(event.starts_at)}</p>
-        <p>{event.description}</p>
-        <div className="divider" />
-        <div className="row" style={{ gap: '2rem' }}>
-          <div>
-            <div className="muted" style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>Price</div>
-            <div className="mono" style={{ fontSize: '1.1rem' }}>{formatTokenAmount(event.price, 7)} XLM</div>
+      <section className="hero reveal">
+        <div className="hero-grid">
+          <div className="hero-copy stack">
+            <span className="eyebrow">Event page</span>
+            <h1 className="h1">{event.title}</h1>
+            <p className="lead">
+              {event.description}
+            </p>
+            <div className="row">
+              <span className="tag tag-accent">{eventStatusLabel(event.status)}</span>
+              <span className="tag">{event.venue}</span>
+              <span className="tag">#{event.id}</span>
+            </div>
           </div>
-          <div>
-            <div className="muted" style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>Capacity</div>
-            <div className="mono" style={{ fontSize: '1.1rem' }}>{event.capacity}</div>
+
+          <div className="surface feature-card stack floating">
+            <div className="row" style={{ justifyContent: 'space-between' }}>
+              <span className="muted">Back to browse</span>
+              <Link href="/" className="btn btn-ghost">
+                All events
+              </Link>
+            </div>
+            <div className="divider" />
+            <div className="grid-2">
+              <StatMini label="Price" value={`${formatTokenAmount(event.price, 7)} XLM`} />
+              <StatMini label="Capacity" value={String(event.capacity)} />
+              <StatMini label="Sold" value={`${stats?.sold ?? event.sold}`} />
+              <StatMini label="Checked in" value={`${stats?.checked_in ?? 0}`} />
+            </div>
           </div>
-          <div>
-            <div className="muted" style={{ fontSize: '0.75rem', textTransform: 'uppercase' }}>Refund cutoff</div>
-            <div className="mono" style={{ fontSize: '1.1rem' }}>{formatUnixDateTime(event.refund_cutoff)}</div>
-          </div>
-        </div>
-        <div className="divider" />
-        <div className="progress" aria-label="tickets sold">
-          <div className="progress-fill" style={{ width: `${percent}%` }} />
-        </div>
-        <div className="muted" style={{ marginTop: '0.4rem' }}>
-          {stats?.sold ?? event.sold} of {event.capacity} sold · {stats?.refunded ?? event.refunded} refunded ·{' '}
-          {stats?.checked_in ?? 0} checked in
         </div>
       </section>
 
-      <div className="grid-2">
-        <BuyTicketPanel
-          eventId={eventId}
-          organizer={event.organizer}
-          status={event.status}
-          canBuy={canBuy}
-          price={event.price}
-        />
-        <OrganizerActions event={event} isOrganizer={false} />
-      </div>
+      <section className="surface-grid">
+        <section className="surface span-7 stack">
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <span className="eyebrow">Overview</span>
+            <span className="tag tag-warning">Refund cutoff {formatUnixDateTime(event.refund_cutoff)}</span>
+          </div>
+          <div className="progress" aria-label="tickets sold">
+            <div className="progress-fill" style={{ width: `${percent}%` }} />
+          </div>
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <div className="stack" style={{ gap: '0.3rem' }}>
+              <div className="stat-label">Schedule</div>
+              <div className="mono">{formatUnixDateTime(event.starts_at)}</div>
+            </div>
+            <div className="stack" style={{ gap: '0.3rem' }}>
+              <div className="stat-label">Refund window</div>
+              <div className="mono">{formatUnixDateTime(event.refund_cutoff)}</div>
+            </div>
+          </div>
+          <div className="notice">
+            {stats?.sold ?? event.sold} of {event.capacity} sold · {stats?.refunded ?? event.refunded} refunded ·{' '}
+            {stats?.checked_in ?? 0} checked in
+          </div>
+        </section>
+
+        <section className="surface span-5 stack">
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <span className="eyebrow">Actions</span>
+            <span className="tag tag-accent">{canBuy ? 'Live' : 'Paused'}</span>
+          </div>
+          <BuyTicketPanel
+            eventId={eventId}
+            organizer={event.organizer}
+            status={event.status}
+            canBuy={canBuy}
+            price={event.price}
+          />
+          <OrganizerActions event={event} isOrganizer={false} />
+        </section>
+      </section>
 
       {CONTRACT_ID && <EventSharePanel eventId={eventId} contractId={CONTRACT_ID} />}
 
-      <section className="card">
-        <h2 className="h2">Tickets</h2>
+      <section className="surface stack">
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <div>
+            <span className="eyebrow">Tickets</span>
+            <h2 className="h2" style={{ marginTop: '0.6rem' }}>
+              All ticket records
+            </h2>
+          </div>
+          <span className="tag">{ticketIds.length} total</span>
+        </div>
         {ticketIds.length === 0 && <p className="muted">No tickets sold yet.</p>}
         {ticketIds.length > 0 && (
-          <div className="stack">
+          <div className="grid-2">
             {ticketIds.map((tid) => (
               <TicketRow key={tid} ticketId={tid} refundCutoffPassed={refundCutoffPassed} />
             ))}
@@ -104,7 +140,7 @@ async function TicketRow({ ticketId, refundCutoffPassed }: { ticketId: number; r
         ? 'Checked in'
         : 'Refunded'
   return (
-    <div className="card card-elev-2">
+    <div className="card card-elev-2 stack">
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <div>
           <div className="mono">#{ticket.id}</div>
@@ -123,6 +159,17 @@ async function TicketRow({ ticketId, refundCutoffPassed }: { ticketId: number; r
         </span>
       </div>
       <TicketActions ticket={ticket} isOrganizer={false} refundCutoffPassed={refundCutoffPassed} />
+    </div>
+  )
+}
+
+function StatMini({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="card" style={{ padding: '1rem' }}>
+      <div className="stat-label">{label}</div>
+      <div className="mono" style={{ marginTop: '0.4rem', fontSize: '1.05rem' }}>
+        {value}
+      </div>
     </div>
   )
 }

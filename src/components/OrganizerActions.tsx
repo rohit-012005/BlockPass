@@ -44,8 +44,16 @@ export function OrganizerActions({ event, isOrganizer }: Props) {
   }
 
   return (
-    <div className="card stack">
-      <h2 className="h2">Organizer controls</h2>
+    <div className="stack">
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <div>
+          <span className="eyebrow">Organizer tools</span>
+          <h2 className="h2" style={{ marginTop: '0.5rem' }}>
+            Organizer controls
+          </h2>
+        </div>
+        <span className="tag tag-accent">Action center</span>
+      </div>
       <p className="muted">You are the organizer of this event.</p>
       <div className="row" style={{ gap: '0.5rem' }}>
         {canClose && (

@@ -109,165 +109,217 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="stack" style={{ maxWidth: 720, margin: '0 auto' }}>
-      <h1 className="h1">Create an event</h1>
-      <p className="muted">
-        Set up your event on Stellar Testnet. Money is held in escrow and refunded automatically
-        if you cancel before the refund cutoff.
-      </p>
-      <form onSubmit={onSubmit} className="card stack">
-        <Field label="Title">
-          <input
-            required
-            value={form.title}
-            onChange={(e) => update('title', e.target.value)}
-            placeholder="Rooftop comedy night"
-          />
-        </Field>
-        <Field label="Description">
-          <textarea
-            rows={3}
-            value={form.description}
-            onChange={(e) => update('description', e.target.value)}
-            placeholder="Five sets, one rooftop, one rain plan."
-          />
-        </Field>
-        <Field label="Venue">
-          <input
-            required
-            value={form.venue}
-            onChange={(e) => update('venue', e.target.value)}
-            placeholder="Backyard, Bandra"
-          />
-        </Field>
-        <div className="grid-2">
-          <Field label="Date">
-            <input
-              required
-              type="date"
-              value={form.date}
-              onChange={(e) => update('date', e.target.value)}
-            />
-          </Field>
-          <Field label="Time">
-            <input
-              required
-              type="time"
-              value={form.time}
-              onChange={(e) => update('time', e.target.value)}
-            />
-          </Field>
-        </div>
-        <div className="grid-2">
-          <Field label="Refund cutoff date">
-            <input
-              required
-              type="date"
-              value={form.refundCutoffDate}
-              onChange={(e) => update('refundCutoffDate', e.target.value)}
-            />
-          </Field>
-          <Field label="Refund cutoff time">
-            <input
-              required
-              type="time"
-              value={form.refundCutoffTime}
-              onChange={(e) => update('refundCutoffTime', e.target.value)}
-            />
-          </Field>
-        </div>
-        <div className="grid-2">
-          <Field label="Capacity">
-            <input
-              required
-              type="number"
-              min={1}
-              value={form.capacity}
-              onChange={(e) => update('capacity', e.target.value)}
-            />
-          </Field>
-          <Field label="Max tickets per buyer">
-            <input
-              required
-              type="number"
-              min={1}
-              value={form.maxPerBuyer}
-              onChange={(e) => update('maxPerBuyer', e.target.value)}
-            />
-          </Field>
-        </div>
-        <div className="grid-2">
-          <Field label="Price (XLM)">
-            <input
-              required
-              type="number"
-              step="0.0000001"
-              min={0.0000001}
-              value={form.price}
-              onChange={(e) => update('price', e.target.value)}
-            />
-          </Field>
-          <Field label="Asset contract id (C…)">
-            <input
-              required
-              value={form.asset}
-              onChange={(e) => update('asset', e.target.value)}
-              placeholder="C… (native XLM SAC or USDC SAC)"
-            />
-          </Field>
-        </div>
-        <div className="muted">
-          Network: {NETWORK.networkPassphrase}. The contract id your client will call is
-          configured via <span className="kbd">NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID</span>.
-        </div>
-        {address && (
-          <div className="muted">
-            Connected as <span className="mono">{shortAddress(address, 6, 4)}</span>
+    <div className="stack">
+      <section className="hero reveal">
+        <div className="hero-grid">
+          <div className="hero-copy stack">
+            <span className="eyebrow">Create flow</span>
+            <h1 className="h1">Build an event that feels premium before tickets even sell.</h1>
+            <p className="lead">
+              Draft the event, preview the final ticket experience, and publish with escrow rules
+              already baked in. The same flow powers public sales, refunds, and check-in.
+            </p>
+            <div className="row">
+              <span className="tag tag-accent">Escrow ready</span>
+              <span className="tag">Refund cutoff</span>
+              <span className="tag">QR check-in</span>
+            </div>
           </div>
-        )}
-        {!address && (
-          <button type="button" className="btn btn-primary" onClick={connect}>
-            Connect wallet to continue
-          </button>
-        )}
-        {address && (
-          <button type="submit" className="btn btn-primary" disabled={busy}>
-            {busy ? 'Submitting…' : 'Create event'}
-          </button>
-        )}
-        {error && <div className="notice notice-error">{error}</div>}
-        {success && (
-          <div className="notice notice-success">
-            Event #{success.eventId} created. Tx: <span className="mono">{success.hash}</span>
-          </div>
-        )}
-        {form.title && (
-          <div className="muted">
-            Shareable link preview:{' '}
-            <span className="mono">/event/{slugify(form.title) || 'new'}</span> (final URL is
-            numeric)
-          </div>
-        )}
-      </form>
 
-      {(form.title || form.venue || form.date) && (
-        <section className="card stack">
-          <h2 className="h2">Live preview</h2>
-          <p className="muted" style={{ margin: 0 }}>
-            Review title, venue, price, and dates before you submit.
-          </p>
+          <div className="surface feature-card stack floating">
+            <div className="row" style={{ justifyContent: 'space-between' }}>
+              <span className="muted">Network</span>
+              <span className="tag tag-warning">Testnet</span>
+            </div>
+            <div className="divider" />
+            <div className="stack">
+              <MiniRow label="Contract" value="BlockPass escrow" />
+              <MiniRow label="Identity" value={address ? shortAddress(address, 8, 4) : 'connect wallet'} />
+              <MiniRow label="Rules" value="Capacity, price, refund cutoff" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="surface-grid">
+        <form onSubmit={onSubmit} className="surface span-8 stack">
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <div>
+              <span className="eyebrow">Event details</span>
+              <h2 className="h2" style={{ marginTop: '0.7rem' }}>
+                Draft the public listing
+              </h2>
+            </div>
+            <span className="tag tag-accent">Live form</span>
+          </div>
+
+          <Field label="Title">
+            <input
+              required
+              value={form.title}
+              onChange={(e) => update('title', e.target.value)}
+              placeholder="Rooftop comedy night"
+            />
+          </Field>
+          <Field label="Description">
+            <textarea
+              rows={3}
+              value={form.description}
+              onChange={(e) => update('description', e.target.value)}
+              placeholder="Five sets, one rooftop, one rain plan."
+            />
+          </Field>
+          <Field label="Venue">
+            <input
+              required
+              value={form.venue}
+              onChange={(e) => update('venue', e.target.value)}
+              placeholder="Backyard, Bandra"
+            />
+          </Field>
+
           <div className="grid-2">
+            <Field label="Date">
+              <input
+                required
+                type="date"
+                value={form.date}
+                onChange={(e) => update('date', e.target.value)}
+              />
+            </Field>
+            <Field label="Time">
+              <input
+                required
+                type="time"
+                value={form.time}
+                onChange={(e) => update('time', e.target.value)}
+              />
+            </Field>
+          </div>
+
+          <div className="grid-2">
+            <Field label="Refund cutoff date">
+              <input
+                required
+                type="date"
+                value={form.refundCutoffDate}
+                onChange={(e) => update('refundCutoffDate', e.target.value)}
+              />
+            </Field>
+            <Field label="Refund cutoff time">
+              <input
+                required
+                type="time"
+                value={form.refundCutoffTime}
+                onChange={(e) => update('refundCutoffTime', e.target.value)}
+              />
+            </Field>
+          </div>
+
+          <div className="grid-2">
+            <Field label="Capacity">
+              <input
+                required
+                type="number"
+                min={1}
+                value={form.capacity}
+                onChange={(e) => update('capacity', e.target.value)}
+              />
+            </Field>
+            <Field label="Max tickets per buyer">
+              <input
+                required
+                type="number"
+                min={1}
+                value={form.maxPerBuyer}
+                onChange={(e) => update('maxPerBuyer', e.target.value)}
+              />
+            </Field>
+          </div>
+
+          <div className="grid-2">
+            <Field label="Price (XLM)">
+              <input
+                required
+                type="number"
+                step="0.0000001"
+                min={0.0000001}
+                value={form.price}
+                onChange={(e) => update('price', e.target.value)}
+              />
+            </Field>
+            <Field label="Asset contract id (C…)">
+              <input
+                required
+                value={form.asset}
+                onChange={(e) => update('asset', e.target.value)}
+                placeholder="C… (native XLM SAC or USDC SAC)"
+              />
+            </Field>
+          </div>
+
+          <div className="notice">
+            Network: {NETWORK.networkPassphrase}. The live contract id comes from{' '}
+            <span className="kbd">NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID</span>.
+          </div>
+
+          {address && (
+            <div className="notice notice-success">
+              Connected as <span className="mono">{shortAddress(address, 6, 4)}</span>
+            </div>
+          )}
+          {!address && (
+            <button type="button" className="btn btn-primary" onClick={connect}>
+              Connect wallet to continue
+            </button>
+          )}
+          {address && (
+            <button type="submit" className="btn btn-primary" disabled={busy}>
+              {busy ? 'Submitting…' : 'Create event'}
+            </button>
+          )}
+          {error && <div className="notice notice-error">{error}</div>}
+          {success && (
+            <div className="notice notice-success">
+              Event #{success.eventId} created. Tx: <span className="mono">{success.hash}</span>
+            </div>
+          )}
+          {form.title && (
+            <div className="muted">
+              Shareable link preview: <span className="mono">/event/{slugify(form.title) || 'new'}</span>{' '}
+              (final URL is numeric)
+            </div>
+          )}
+        </form>
+
+        <aside className="surface span-4 stack">
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <span className="eyebrow">Preview</span>
+            <span className="tag tag-success">Auto-update</span>
+          </div>
+          <h2 className="h2" style={{ marginTop: '0.2rem' }}>
+            What attendees will see
+          </h2>
+          <p className="lead" style={{ marginBottom: 0 }}>
+            A clean event page, clear refund line, and enough detail to build trust before checkout.
+          </p>
+          <div className="divider" />
+          <div className="stack">
             <PreviewStat label="Title" value={form.title || 'Untitled event'} />
             <PreviewStat label="Venue" value={form.venue || 'Venue pending'} />
-            <PreviewStat label="Price" value={`${formatTokenAmount(BigInt(Math.round(Number(form.price || 0) * 10_000_000)), 7)} XLM`} />
+            <PreviewStat
+              label="Price"
+              value={`${formatTokenAmount(BigInt(Math.round(Number(form.price || 0) * 10_000_000)), 7)} XLM`}
+            />
             <PreviewStat label="Capacity" value={form.capacity || '0'} />
+            <PreviewStat label="Refund cutoff" value={formatDatePreview(form.refundCutoffDate, form.refundCutoffTime)} />
           </div>
-          <div className="muted">
+          <div className="notice">
             Starts {formatDatePreview(form.date, form.time)} · refunds close{' '}
             {formatDatePreview(form.refundCutoffDate, form.refundCutoffTime)}
           </div>
-        </section>
-      )}
+        </aside>
+      </section>
     </div>
   )
 }
@@ -295,6 +347,15 @@ function PreviewStat({ label, value }: { label: string; value: string }) {
       <div className="mono" style={{ marginTop: '0.25rem' }}>
         {value}
       </div>
+    </div>
+  )
+}
+
+function MiniRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="row" style={{ justifyContent: 'space-between' }}>
+      <span className="muted">{label}</span>
+      <span className="mono">{value}</span>
     </div>
   )
 }

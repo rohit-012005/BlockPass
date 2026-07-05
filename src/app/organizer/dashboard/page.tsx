@@ -13,9 +13,13 @@ export default function OrganizerDashboard() {
 
   if (!address) {
     return (
-      <div className="card stack">
-        <h1 className="h1">Organizer dashboard</h1>
-        <p className="muted">Connect the wallet that owns your events.</p>
+      <div className="hero stack">
+        <span className="eyebrow">Organizer dashboard</span>
+        <h1 className="h1">Connect the wallet that owns your events.</h1>
+        <p className="lead">
+          This dashboard keeps event health, check-in, and action controls in one place so the
+          organizer flow stays fast.
+        </p>
         <button className="btn btn-primary" onClick={connect} style={{ alignSelf: 'flex-start' }}>
           Connect wallet
         </button>
@@ -25,23 +29,49 @@ export default function OrganizerDashboard() {
 
   return (
     <div className="stack">
-      <h1 className="h1">Organizer dashboard</h1>
-      {events.data && events.data.length > 0 && <DashboardStats items={events.data} />}
-      <div className="row">
-        <Link href="/create" className="btn btn-primary">
-          + New event
-        </Link>
-        {events.data && events.data.length > 0 && (
-          <Link href={`/scan/${events.data[0]?.id ?? ''}`} className="btn btn-ghost">
-            Open check-in for latest event
-          </Link>
-        )}
-      </div>
+      <section className="hero reveal">
+        <div className="hero-grid">
+          <div className="hero-copy stack">
+            <span className="eyebrow">Organizer dashboard</span>
+            <h1 className="h1">Command center for live events.</h1>
+            <p className="lead">
+              See ticket flow, open check-in, and jump into the right event without hunting through
+              menus.
+            </p>
+            <div className="row">
+              <Link href="/create" className="btn btn-primary">
+                + New event
+              </Link>
+              {events.data && events.data.length > 0 && (
+                <Link href={`/scan/${events.data[0]?.id ?? ''}`} className="btn btn-ghost">
+                  Open check-in
+                </Link>
+              )}
+            </div>
+          </div>
+
+          <div className="surface feature-card stack floating">
+            <span className="tag tag-accent">Wallet connected</span>
+            <div className="divider" />
+            <div className="grid-2">
+              <MiniStat label="Events" value={String(events.data?.length ?? 0)} />
+              <MiniStat label="Live" value={String(events.data?.filter(({ event }) => event.status === EVENT_STATUS.ON_SALE).length ?? 0)} />
+              <MiniStat label="Sold out" value={String(events.data?.filter(({ event }) => event.status === EVENT_STATUS.SOLD_OUT).length ?? 0)} />
+              <MiniStat label="Tickets sold" value={String(events.data?.reduce((sum, { event }) => sum + event.sold, 0) ?? 0)} />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {events.isLoading && <p className="muted">Loading…</p>}
       {events.error && <div className="notice notice-error">{events.error}</div>}
       {events.data && events.data.length === 0 && (
-        <div className="card stack">
-          <p className="muted">You haven&apos;t created any events yet.</p>
+        <div className="surface stack">
+          <span className="eyebrow">Empty state</span>
+          <h2 className="h2" style={{ marginTop: '0.5rem' }}>
+            No events yet
+          </h2>
+          <p className="muted">Start with one event, then reuse the dashboard for future launches.</p>
           <Link href="/create" className="btn btn-primary" style={{ alignSelf: 'flex-start' }}>
             Create your first event
           </Link>
@@ -53,14 +83,16 @@ export default function OrganizerDashboard() {
             <Link
               href={`/event/${id}`}
               key={id}
-              className="card"
+              className="surface stack"
               style={{ display: 'block', color: 'inherit' }}
             >
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <span className={statusTag(event.status)}>{eventStatusLabel(event.status)}</span>
                 <span className="muted mono">#{id}</span>
               </div>
-              <h3 className="h3" style={{ marginTop: '0.5rem' }}>{event.title}</h3>
+              <h3 className="h3" style={{ marginTop: '0.5rem' }}>
+                {event.title}
+              </h3>
               <p className="muted" style={{ margin: 0 }}>
                 {event.venue} · {formatUnixDateTime(event.starts_at)}
               </p>
@@ -78,33 +110,11 @@ export default function OrganizerDashboard() {
   )
 }
 
-function DashboardStats({
-  items,
-}: {
-  items: { id: number; event: { sold: number; capacity: number; status: number } }[]
-}) {
-  const totalEvents = items.length
-  const activeEvents = items.filter(({ event }) => event.status === EVENT_STATUS.ON_SALE).length
-  const soldOutEvents = items.filter(({ event }) => event.status === EVENT_STATUS.SOLD_OUT).length
-  const totalSold = items.reduce((sum, { event }) => sum + event.sold, 0)
-
+function MiniStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid-2">
-      <StatCard label="Events" value={String(totalEvents)} />
-      <StatCard label="Live" value={String(activeEvents)} accent />
-      <StatCard label="Sold out" value={String(soldOutEvents)} />
-      <StatCard label="Tickets sold" value={String(totalSold)} />
-    </div>
-  )
-}
-
-function StatCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
-  return (
-    <div className="card">
-      <div className="muted" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        {label}
-      </div>
-      <div className={accent ? 'tag tag-success' : 'mono'} style={{ marginTop: '0.35rem', fontSize: '1.1rem' }}>
+    <div className="card" style={{ padding: '1rem' }}>
+      <div className="stat-label">{label}</div>
+      <div className="mono" style={{ marginTop: '0.35rem', fontSize: '1.1rem' }}>
         {value}
       </div>
     </div>

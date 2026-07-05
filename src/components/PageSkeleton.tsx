@@ -1,7 +1,7 @@
 export function PageSkeleton({ title, lines = 3 }: { title: string; lines?: number }) {
   return (
     <div className="stack" aria-busy="true" aria-live="polite">
-      <div className="card stack">
+      <div className="surface stack">
         <div className="skeleton skeleton-title" />
         <div className="stack">
           {Array.from({ length: lines }).map((_, index) => (

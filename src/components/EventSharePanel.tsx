@@ -13,8 +13,16 @@ export function EventSharePanel({ eventId, contractId }: Props) {
   const explorerUrl = explorerContractUrl(contractId)
 
   return (
-    <div className="card stack">
-      <h2 className="h2">Share event</h2>
+    <div className="stack">
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <div>
+          <span className="eyebrow">Sharing</span>
+          <h2 className="h2" style={{ marginTop: '0.5rem' }}>
+            Share event
+          </h2>
+        </div>
+        <span className="tag">Link kit</span>
+      </div>
       <p className="muted">
         Copy event link, contract id, or explorer view for users and collaborators.
       </p>

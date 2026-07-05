@@ -7,96 +7,158 @@ export const dynamic = 'force-dynamic'
 export default async function HomePage() {
   let version: string | null = null
   let versionError: string | null = null
+
   if (CONTRACT_ID) {
     try {
       version = await getContractVersion()
-    } catch (e) {
-      versionError = e instanceof Error ? e.message : 'Failed to read contract version'
+    } catch (error) {
+      versionError = error instanceof Error ? error.message : 'Failed to read contract version'
     }
   }
+
   return (
     <div className="stack">
-      <section className="card" style={{ padding: '2.5rem' }}>
-        <span className="tag tag-accent">Powered by Stellar Testnet</span>
-        <h1 className="h1" style={{ marginTop: '1rem' }}>
-          Sell tickets. Cancel cleanly. Refund everyone in one transaction.
-        </h1>
-        <p className="muted" style={{ maxWidth: 640, fontSize: '1.05rem' }}>
-          BlockPass is a small, no-fee way to collect ticket money for a small event. Money sits
-          in a Soroban contract until the event. If the organizer cancels, every buyer is
-          refunded automatically — no manual UPI reversals, no chasing anyone.
-        </p>
-        <div className="row" style={{ marginTop: '1.5rem' }}>
-          <Link href="/create" className="btn btn-primary">
-            Create an event
-          </Link>
-          <Link href="/me/tickets" className="btn btn-ghost">
-            My tickets
-          </Link>
-          <Link href="/organizer/dashboard" className="btn btn-ghost">
-            Organizer dashboard
-          </Link>
-        </div>
-        <div className="divider" />
-        <div className="row" style={{ gap: '2rem', flexWrap: 'wrap' }}>
-          <Stat label="Network" value={isTestnet() ? 'Testnet' : 'Public'} />
-          <Stat label="RPC" value={trim(NETWORK.rpcUrl, 36)} />
-          <Stat
-            label="Contract"
-            value={CONTRACT_ID ? trim(CONTRACT_ID, 16) : 'not deployed'}
-            accent={!CONTRACT_ID}
-          />
-          <Stat
-            label="Contract version"
-            value={versionError ? 'unreachable' : (version ?? '—')}
-            accent={Boolean(versionError)}
-          />
-        </div>
-        {versionError && (
-          <div className="notice notice-error" style={{ marginTop: '1rem' }}>
-            Could not reach the contract at <span className="mono">{CONTRACT_ID}</span>:{' '}
-            {versionError}
+      <section className="hero reveal">
+        <div className="hero-grid">
+          <div className="hero-copy stack">
+            <span className="eyebrow">Stellar-powered event escrow</span>
+            <h1 className="h1">
+              Ticket money stays locked until event ends. Refunds happen without manual drama.
+            </h1>
+            <p className="lead">
+              BlockPass is a production-minded event ticketing platform for organizers who want a
+              low-fee, trust-minimized way to collect payment, cancel cleanly, and check people in
+              at the door.
+            </p>
+            <div className="row" style={{ marginTop: '0.5rem' }}>
+              <Link href="/create" className="btn btn-primary">
+                Create event
+              </Link>
+              <Link href="/story" className="btn btn-ghost">
+                Read story
+              </Link>
+              <Link href="/product" className="btn btn-ghost">
+                See product
+              </Link>
+            </div>
+            <div className="stat-grid" style={{ marginTop: '1.5rem' }}>
+              <Stat label="Network" value={isTestnet() ? 'Testnet' : 'Mainnet'} />
+              <Stat label="RPC" value={trim(NETWORK.rpcUrl, 28)} />
+              <Stat label="Version" value={versionError ? 'offline' : (version ?? '—')} />
+              <Stat label="Contract" value={CONTRACT_ID ? trim(CONTRACT_ID, 18) : 'not deployed'} accent={!CONTRACT_ID} />
+            </div>
           </div>
-        )}
+
+          <div className="hero-collage">
+            <div className="surface feature-card floating hero-card hero-card-main">
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <span className="tag tag-accent">Live on chain</span>
+                <span className="tag">{version ?? 'v0.1'}</span>
+              </div>
+              <div style={{ marginTop: '1.1rem' }}>
+                <div className="stat-label">Deployed contract</div>
+                <div className="mono" style={{ marginTop: '0.45rem' }}>
+                  {CONTRACT_ID ? CONTRACT_ID : 'Deploy contract to show id'}
+                </div>
+              </div>
+              <div className="divider" />
+              <div className="stack">
+                <MiniRow label="Escrow" value="Atomic batch refunds" />
+                <MiniRow label="Check-in" value="QR + HMAC verification" />
+                <MiniRow label="Checkout" value="Organizer confirmation" />
+              </div>
+            </div>
+
+            <div className="surface feature-card reveal reveal-2 hero-card hero-card-note">
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <span className="eyebrow" style={{ transform: 'rotate(-8deg)' }}>
+                  Create
+                </span>
+                <span className="tag tag-success">Ready</span>
+              </div>
+              <p className="lead" style={{ marginBottom: 0 }}>
+                Create page, event page, dashboard, and scanner all use the same paper-card system.
+              </p>
+            </div>
+
+            <div className="surface feature-card reveal reveal-3 hero-card hero-card-sub">
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <span className="muted">Submission</span>
+                <span className="tag tag-warning">Review ready</span>
+              </div>
+              <p className="lead" style={{ marginBottom: 0 }}>
+                README now includes contract details, live placeholders, screenshot list, and
+                structured feedback with commit ids.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <section className="grid-2">
+      <section className="feature-list">
         <Feature
-          title="Start as organizer"
-          body="Create event, connect wallet, set capacity and refund cutoff, then share event link with buyers."
+          title="Built for organizers"
+          body="Create event, publish link, collect funds, and manage cancellations without manually reversing payments."
         />
         <Feature
-          title="Use it at the door"
-          body="Open scan page on mobile or laptop, verify QR token, then tap check-in once buyer arrives."
+          title="Built for attendees"
+          body="Buy ticket, show QR pass, and keep a simple history of purchased tickets and refund status."
         />
         <Feature
-          title="Proof for reviewers"
-          body="The README now keeps architecture, deployment checklist, live links, screenshots, and feedback in one place."
+          title="Built for reviewers"
+          body="Modern landing page, separate story/product/roadmap pages, telemetry, and contract details in one place."
         />
         <Feature
-          title="Quick entry points"
-          body="Create an event, view tickets, or open organizer dashboard from any page in one click."
+          title="Built for real venues"
+          body="Check-in page supports fast scan flow with verification, reset, and clear validation states."
         />
       </section>
 
-      <section className="grid-2">
-        <Feature
-          title="Held in escrow, not in your wallet"
-          body="Ticket money is transferred from the buyer into the contract via the Stellar Asset Contract. The organizer can't run off with it."
-        />
-        <Feature
-          title="Atomic batch refund on cancel"
-          body="If the event is cancelled, the contract iterates every active ticket and SAC-transfers the price back. If any one transfer fails, the whole transaction reverts — no half-refunded events."
-        />
-        <Feature
-          title="Self-refund before cutoff"
-          body="Buyers can self-refund any time before the refund cutoff timestamp. After that, the organizer keeps the funds and confirms the event."
-        />
-        <Feature
-          title="Door QR check-in"
-          body="Each ticket gets a server-signed QR token. The organizer scans it, the server verifies the HMAC, and the on-chain check_in is recorded."
-        />
+      <section className="surface-grid">
+        <article className="surface span-7 feature-card reveal reveal-2">
+          <span className="eyebrow">Problem</span>
+          <h2 className="h2" style={{ marginTop: '0.75rem' }}>
+            Traditional ticketing takes a cut and direct transfers create refund chaos.
+          </h2>
+          <p className="lead">
+            BlockPass solves the exact problem organizers keep running into: payment collection,
+            cancellation handling, and ticket refunds without a pile of manual reconciliation.
+          </p>
+        </article>
+        <article className="surface span-5 feature-card reveal reveal-3">
+          <span className="eyebrow">Why Stellar</span>
+          <p className="lead" style={{ marginBottom: 0 }}>
+            Fast finality, low fees, native USDC support, and Soroban smart contracts make Stellar
+            a strong fit for event escrow and low-value payment flows.
+          </p>
+        </article>
       </section>
+
+      <section className="surface feature-card stack reveal reveal-3">
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <div>
+            <span className="eyebrow">Journey</span>
+            <h2 className="h2" style={{ marginTop: '0.65rem' }}>
+              From create event to check-in.
+            </h2>
+          </div>
+          <Link href="/roadmap" className="btn btn-ghost">
+            Roadmap
+          </Link>
+        </div>
+        <div className="timeline">
+          <TimelineItem index="01" title="Organize" body="Create event, capacity, price, and refund cutoff." />
+          <TimelineItem index="02" title="Distribute" body="Share event link and collect ticket payments into escrow." />
+          <TimelineItem index="03" title="Resolve" body="Confirm event or cancel and refund everyone atomically." />
+          <TimelineItem index="04" title="Scan" body="Use QR token at door, verify it, then check attendee in." />
+        </div>
+      </section>
+
+      {versionError && (
+        <div className="notice notice-error reveal">
+          Could not reach contract at <span className="mono">{CONTRACT_ID}</span>: {versionError}
+        </div>
+      )}
     </div>
   )
 }
@@ -108,24 +170,43 @@ function trim(s: string, n: number): string {
 
 function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div>
-      <div className="muted" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        {label}
-      </div>
-      <div className={accent ? 'tag tag-danger' : 'mono'} style={{ marginTop: '0.25rem' }}>
-        {value}
-      </div>
+    <div className="stat">
+      <div className="stat-label">{label}</div>
+      <div className={accent ? 'stat-value tag tag-danger' : 'stat-value mono'}>{value}</div>
     </div>
   )
 }
 
 function Feature({ title, body }: { title: string; body: string }) {
   return (
-    <div className="card">
+    <article className="card feature-card">
       <h3 className="h3">{title}</h3>
-      <p className="muted" style={{ margin: 0 }}>
+      <p className="muted" style={{ margin: '0.65rem 0 0' }}>
         {body}
       </p>
+    </article>
+  )
+}
+
+function MiniRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="row" style={{ justifyContent: 'space-between' }}>
+      <span className="muted">{label}</span>
+      <span className="mono">{value}</span>
+    </div>
+  )
+}
+
+function TimelineItem({ index, title, body }: { index: string; title: string; body: string }) {
+  return (
+    <div className="timeline-item">
+      <div className="timeline-index">{index}</div>
+      <div>
+        <h3 className="h3">{title}</h3>
+        <p className="muted" style={{ margin: '0.3rem 0 0' }}>
+          {body}
+        </p>
+      </div>
     </div>
   )
 }
