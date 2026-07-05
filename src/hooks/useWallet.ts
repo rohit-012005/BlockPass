@@ -18,6 +18,7 @@ import {
 } from '@creit.tech/stellar-wallets-kit'
 import type { ModuleInterface } from '@creit.tech/stellar-wallets-kit'
 import { NETWORK } from '@/lib/stellar'
+import { trackEvent } from '@/lib/telemetry'
 
 let kitSingleton: StellarWalletsKit | null = null
 
@@ -103,8 +104,13 @@ export function useWallet(): UseWalletState {
             setAddress(addr)
             setWalletId(option.id)
             persist(addr, option.id)
+            void trackEvent('wallet_connected', { walletId: option.id })
           } catch (e) {
             setError(e instanceof Error ? e.message : 'Failed to connect wallet')
+            void trackEvent('wallet_connect_error', {
+              walletId: option.id,
+              error: e instanceof Error ? e.message : 'Failed to connect wallet',
+            })
           }
         },
         onClosed: () => setIsConnecting(false),
@@ -120,6 +126,7 @@ export function useWallet(): UseWalletState {
     setAddress(null)
     setWalletId(null)
     persist(null, null)
+    void trackEvent('wallet_disconnected')
   }, [persist])
 
   const signTransaction = useCallback(

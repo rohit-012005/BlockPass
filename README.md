@@ -54,6 +54,36 @@ npm run contract:deploy
 The deploy script writes `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=…` to
 `.env.local` automatically.
 
+## Submission Pack
+
+Use this section as final submission checklist.
+
+Live demo
+- `https://your-blockpass-demo.vercel.app`
+
+Demo video
+- `https://loom.com/share/your-demo-video`
+
+Contract deployment
+- Testnet contract id: `C...`
+- Deployment tx: `https://stellar.expert/explorer/testnet/tx/...`
+
+Screenshots
+- `docs/submission/screenshots/01-home.png`
+- `docs/submission/screenshots/02-create-mobile.png`
+- `docs/submission/screenshots/03-analytics-monitoring.png`
+
+User proof
+- Wallet interaction proof: `docs/submission/user-interactions.md`
+- Feedback summary: `docs/submission/user-feedback.md`
+
+Analytics and monitoring
+- Telemetry surface: `src/components/PageTelemetry.tsx`
+- Collector endpoint: `src/app/api/telemetry/route.ts`
+- Env base URL: `NEXT_PUBLIC_APP_URL`
+
+If any field is still pending, keep placeholder text in those files instead of removing the section.
+
 ## Layout
 
 ```

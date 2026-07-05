@@ -1,11 +1,16 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import './globals.css'
 import { WalletButton } from '@/components/WalletButton'
 import { isTestnet, NETWORK } from '@/lib/stellar'
 import { CONTRACT_ID } from '@/lib/stellar'
+import { PageTelemetry } from '@/components/PageTelemetry'
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: 'BlockPass — collect tickets on Stellar',
   description:
     'A simple way to collect ticket money for a small event on Stellar, with automatic refunds if you cancel.',
@@ -21,6 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
+        <Suspense fallback={null}>
+          <PageTelemetry />
+        </Suspense>
         <header className="container row" style={{ justifyContent: 'space-between', padding: '1rem 1.5rem' }}>
           <div className="row" style={{ gap: '1.25rem' }}>
             <Link href="/" style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--text)' }}>

@@ -6,6 +6,7 @@ import { useWallet } from '@/hooks/useWallet'
 import { useEventStats } from '@/hooks/useEvent'
 import { buyTicket } from '@/lib/contract'
 import { CONTRACT_ERRORS } from '@/types'
+import { trackEvent } from '@/lib/telemetry'
 
 interface Props {
   eventId: number
@@ -43,12 +44,20 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
     try {
       const result = await buyTicket(eventId, address, signTransaction)
       setSuccess(result)
+      void trackEvent('buy_ticket_success', {
+        eventId,
+        ticketId: result.ticketId,
+      })
       // bounce user to their ticket page
       router.push(`/me/tickets?just=${result.ticketId}`)
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to buy ticket'
       const decoded = decodeFromMessage(msg)
       setError(decoded)
+      void trackEvent('buy_ticket_error', {
+        eventId,
+        error: decoded,
+      })
     } finally {
       setBusy(false)
     }
@@ -82,7 +91,13 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
         </button>
       )}
       {!address && (
-        <button className="btn btn-primary" onClick={connect}>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            void trackEvent('wallet_connect_click', { eventId })
+            void connect()
+          }}
+        >
           Connect wallet to buy
         </button>
       )}
