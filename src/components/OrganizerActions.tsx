@@ -9,15 +9,15 @@ import { EVENT_STATUS } from '@/types'
 
 interface Props {
   event: EventRecord
-  isOrganizer: boolean
 }
 
-export function OrganizerActions({ event, isOrganizer }: Props) {
+export function OrganizerActions({ event }: Props) {
   const { address, signTransaction } = useWallet()
   const router = useRouter()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastTx, setLastTx] = useState<string | null>(null)
+  const isOrganizer = address === event.organizer
 
   if (!isOrganizer || !address) return null
 

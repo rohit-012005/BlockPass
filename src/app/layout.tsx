@@ -9,7 +9,8 @@ import { CONTRACT_ID } from '@/lib/stellar'
 import { PageTelemetry } from '@/components/PageTelemetry'
 import { PageMotion } from '@/components/PageMotion'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
+const APP_URL = readAppUrl()
+const SOURCE_URL = 'https://github.com/rohit-012005/BlockPass'
 const fontDisplay = Fraunces({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700'],
@@ -28,13 +29,17 @@ const fontMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  title: 'BlockPass — collect tickets on Stellar',
+  title: {
+    default: 'BlockPass — collect tickets on Stellar',
+    template: '%s',
+  },
   description:
     'A simple way to collect ticket money for a small event on Stellar, with automatic refunds if you cancel.',
   openGraph: {
     title: 'BlockPass',
     description: 'Collect ticket money on Stellar. Refund automatically on cancel.',
     type: 'website',
+    url: APP_URL,
   },
 }
 
@@ -88,7 +93,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/story">Story</Link>
               <Link href="/product">Product</Link>
               <Link href="/roadmap">Roadmap</Link>
-              <a href="https://github.com/" rel="noreferrer noopener" target="_blank">
+              <a href={SOURCE_URL} rel="noreferrer noopener" target="_blank">
                 Source
               </a>
             </div>
@@ -97,4 +102,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </body>
     </html>
   )
+}
+
+function readAppUrl(): string {
+  const value = process.env.NEXT_PUBLIC_APP_URL
+  if (!value) return 'http://localhost:3000'
+
+  try {
+    return new URL(value).toString()
+  } catch {
+    return 'http://localhost:3000'
+  }
 }

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
 import { serverGetTicket } from '@/lib/server-contract'
+import { jsonError, jsonResponse } from '@/lib/api'
 
 export const runtime = 'nodejs'
 
@@ -11,16 +11,13 @@ export async function GET(_request: Request, ctx: Ctx) {
   const { id } = await ctx.params
   const ticketId = Number(id)
   if (!Number.isFinite(ticketId) || ticketId <= 0) {
-    return NextResponse.json({ error: 'invalid ticket id' }, { status: 400 })
+    return jsonError('invalid ticket id')
   }
   try {
     const ticket = await serverGetTicket(ticketId)
-    if (!ticket) return NextResponse.json({ error: 'ticket not found' }, { status: 404 })
-    return NextResponse.json(ticket)
+    if (!ticket) return jsonError('ticket not found', 404)
+    return jsonResponse(ticket)
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'failed to read ticket' },
-      { status: 500 },
-    )
+    return jsonError(e instanceof Error ? e.message : 'failed to read ticket', 500)
   }
 }

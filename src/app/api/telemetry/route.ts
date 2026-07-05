@@ -1,11 +1,36 @@
-import { NextResponse } from 'next/server'
+import { z } from 'zod'
+import { jsonResponse } from '@/lib/api'
+
+const TelemetrySchema = z.object({
+  event: z.string().trim().min(1).max(64),
+  payload: z
+    .object({
+      path: z.string().trim().max(512).optional(),
+      referrer: z.string().trim().max(512).optional(),
+      walletId: z.string().trim().max(64).optional(),
+      eventId: z.number().int().positive().optional(),
+      ticketId: z.number().int().positive().optional(),
+      error: z.string().trim().max(500).optional(),
+    })
+    .partial()
+    .default({}),
+  path: z.string().trim().max(512).optional(),
+  ts: z.number().int().nonnegative(),
+})
 
 export async function POST(request: Request) {
+  let body: unknown
   try {
-    const body = await request.json()
-    console.info('[telemetry]', JSON.stringify(body))
+    body = await request.json()
   } catch {
-    console.info('[telemetry] received malformed payload')
+    return jsonResponse({ ok: false, error: 'invalid json' }, { status: 400 })
   }
-  return NextResponse.json({ ok: true })
+
+  const parsed = TelemetrySchema.safeParse(body)
+  if (!parsed.success) {
+    return jsonResponse({ ok: false, error: 'invalid telemetry payload' }, { status: 400 })
+  }
+
+  console.info('[telemetry]', JSON.stringify(parsed.data))
+  return jsonResponse({ ok: true }, { status: 202 })
 }

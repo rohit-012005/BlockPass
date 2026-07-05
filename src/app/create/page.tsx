@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useWallet } from '@/hooks/useWallet'
 import { createEvent } from '@/lib/contract'
 import { CONTRACT_ERRORS } from '@/types'
-import { NETWORK, isValidStellarAddress, shortAddress } from '@/lib/stellar'
+import { NETWORK, isTestnet, isValidStellarContractId, shortAddress } from '@/lib/stellar'
 import { formatTokenAmount, slugify } from '@/lib/format'
 
 interface FormState {
@@ -61,16 +61,15 @@ export default function CreateEventPage() {
       setError('Please enter valid date and time for both the event start and refund cutoff.')
       return
     }
-    if (!isValidStellarAddress(form.asset)) {
+    if (!isValidStellarContractId(form.asset.trim())) {
       setError('Asset contract id must be a valid C… address. Look it up on Stellar Expert.')
       return
     }
-    const priceWhole = Number(form.price)
-    if (!Number.isFinite(priceWhole) || priceWhole <= 0) {
+    const price = parseTokenAmount(form.price)
+    if (price == null || price <= 0n) {
       setError('Price must be a positive number.')
       return
     }
-    const price = BigInt(Math.round(priceWhole * 10_000_000)) // 7 decimals
     const capacity = Number(form.capacity)
     if (!Number.isInteger(capacity) || capacity <= 0) {
       setError('Capacity must be a positive integer.')
@@ -79,6 +78,10 @@ export default function CreateEventPage() {
     const maxPerBuyer = Number(form.maxPerBuyer)
     if (!Number.isInteger(maxPerBuyer) || maxPerBuyer <= 0) {
       setError('Per-buyer limit must be a positive integer.')
+      return
+    }
+    if (refundCutoff >= startsAt) {
+      setError('Refund cutoff must be earlier than event start.')
       return
     }
 
@@ -129,7 +132,9 @@ export default function CreateEventPage() {
           <div className="surface feature-card stack floating">
             <div className="row" style={{ justifyContent: 'space-between' }}>
               <span className="muted">Network</span>
-              <span className="tag tag-warning">Testnet</span>
+              <span className={`tag ${isTestnet() ? 'tag-warning' : 'tag-success'}`}>
+                {isTestnet() ? 'Testnet' : 'Mainnet'}
+              </span>
             </div>
             <div className="divider" />
             <div className="stack">
@@ -309,7 +314,7 @@ export default function CreateEventPage() {
             <PreviewStat label="Venue" value={form.venue || 'Venue pending'} />
             <PreviewStat
               label="Price"
-              value={`${formatTokenAmount(BigInt(Math.round(Number(form.price || 0) * 10_000_000)), 7)} XLM`}
+              value={`${formatTokenAmount(parseTokenAmount(form.price) ?? 0n, 7)} XLM`}
             />
             <PreviewStat label="Capacity" value={form.capacity || '0'} />
             <PreviewStat label="Refund cutoff" value={formatDatePreview(form.refundCutoffDate, form.refundCutoffTime)} />
@@ -366,6 +371,15 @@ function composeTimestamp(date: string, time: string): number | null {
   const ts = new Date(iso).getTime()
   if (Number.isNaN(ts)) return null
   return Math.floor(ts / 1000)
+}
+
+function parseTokenAmount(value: string): bigint | null {
+  const trimmed = value.trim()
+  if (!trimmed) return 0n
+  if (!/^\d+(\.\d{0,7})?$/.test(trimmed)) return null
+
+  const [whole, fraction = ''] = trimmed.split('.')
+  return BigInt(`${whole}${fraction.padEnd(7, '0')}`)
 }
 
 function decodeMessage(message: string): string {

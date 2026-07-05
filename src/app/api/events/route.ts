@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import {
   serverGetEvent,
   serverListOrganizerEvents,
 } from '@/lib/server-contract'
+import { jsonError, jsonResponse } from '@/lib/api'
 
 export const runtime = 'nodejs'
 
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const parsed = QuerySchema.safeParse(Object.fromEntries(url.searchParams.entries()))
   if (!parsed.success) {
-    return NextResponse.json({ error: 'organizer query is required' }, { status: 400 })
+    return jsonError('organizer query is required')
   }
   const organizer = parsed.data.organizer
   try {
@@ -29,11 +29,8 @@ export async function GET(request: Request) {
     const filtered = events.filter(
       (x): x is { id: number; event: NonNullable<typeof x>['event'] } => x !== null,
     )
-    return NextResponse.json(filtered)
+    return jsonResponse(filtered)
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'Failed to load events' },
-      { status: 500 },
-    )
+    return jsonError(e instanceof Error ? e.message : 'Failed to load events', 500)
   }
 }

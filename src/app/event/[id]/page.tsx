@@ -1,12 +1,12 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { serverGetEvent, serverGetEventStats, serverListEventTickets, serverGetTicket } from '@/lib/server-contract'
+import type { Metadata } from 'next'
+import { serverGetEvent, serverGetEventStats } from '@/lib/server-contract'
 import { BuyTicketPanel } from '@/components/BuyTicketPanel'
 import { OrganizerActions } from '@/components/OrganizerActions'
-import { TicketActions } from '@/components/TicketActions'
 import { EventSharePanel } from '@/components/EventSharePanel'
 import { formatTokenAmount, formatUnixDateTime, eventStatusLabel, progressPercent } from '@/lib/format'
-import { EVENT_STATUS, TICKET_STATE } from '@/types'
+import { EVENT_STATUS } from '@/types'
 import { CONTRACT_ID } from '@/lib/stellar'
 
 interface Params {
@@ -14,6 +14,44 @@ interface Params {
 }
 
 export const dynamic = 'force-dynamic'
+
+export async function generateMetadata({ params }: Params): Promise<Metadata> {
+  const { id } = await params
+  const eventId = Number(id)
+  if (!Number.isFinite(eventId) || eventId <= 0) {
+    return {
+      title: 'Event not found | BlockPass',
+    }
+  }
+
+  try {
+    const event = await serverGetEvent(eventId)
+    if (!event) {
+      return {
+        title: 'Event not found | BlockPass',
+      }
+    }
+
+    const title = `${event.title} | BlockPass`
+    const description = event.description || `${event.venue} · ${formatUnixDateTime(event.starts_at)}`
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        type: 'website',
+        images: [`/api/og/${event.id}`],
+      },
+    }
+  } catch {
+    return {
+      title: 'Event | BlockPass',
+      description: 'Stellar-powered event checkout, refunds, and check-in.',
+    }
+  }
+}
 
 export default async function EventPage({ params }: Params) {
   const { id } = await params
@@ -24,10 +62,8 @@ export default async function EventPage({ params }: Params) {
   const event = await serverGetEvent(eventId)
   if (!event) notFound()
   const stats = await serverGetEventStats(eventId)
-  const ticketIds = await serverListEventTickets(eventId)
   const percent = progressPercent(stats?.sold ?? 0, stats?.capacity ?? 1)
   const canBuy = event.status === EVENT_STATUS.ON_SALE
-  const refundCutoffPassed = Math.floor(Date.now() / 1000) >= event.refund_cutoff
 
   return (
     <div className="stack">
@@ -101,7 +137,7 @@ export default async function EventPage({ params }: Params) {
             canBuy={canBuy}
             price={event.price}
           />
-          <OrganizerActions event={event} isOrganizer={false} />
+          <OrganizerActions event={event} />
         </section>
       </section>
 
@@ -110,55 +146,24 @@ export default async function EventPage({ params }: Params) {
       <section className="surface stack">
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <div>
-            <span className="eyebrow">Tickets</span>
+            <span className="eyebrow">Attendance</span>
             <h2 className="h2" style={{ marginTop: '0.6rem' }}>
-              All ticket records
+              Event health at glance
             </h2>
           </div>
-          <span className="tag">{ticketIds.length} total</span>
+          <span className="tag">{stats?.checked_in ?? 0} checked in</span>
         </div>
-        {ticketIds.length === 0 && <p className="muted">No tickets sold yet.</p>}
-        {ticketIds.length > 0 && (
-          <div className="grid-2">
-            {ticketIds.map((tid) => (
-              <TicketRow key={tid} ticketId={tid} refundCutoffPassed={refundCutoffPassed} />
-            ))}
-          </div>
-        )}
+        <p className="muted" style={{ margin: 0 }}>
+          Public page shows aggregate sales and check-in progress. Individual ticket ownership stays
+          private to wallet holder and organizer tools.
+        </p>
+        <div className="grid-2">
+          <StatMini label="Tickets sold" value={String(stats?.sold ?? event.sold)} />
+          <StatMini label="Refunded" value={String(stats?.refunded ?? event.refunded)} />
+          <StatMini label="Checked in" value={String(stats?.checked_in ?? 0)} />
+          <StatMini label="Remaining" value={String(Math.max(0, event.capacity - (stats?.sold ?? event.sold)))} />
+        </div>
       </section>
-    </div>
-  )
-}
-
-async function TicketRow({ ticketId, refundCutoffPassed }: { ticketId: number; refundCutoffPassed: boolean }) {
-  const ticket = await serverGetTicket(ticketId)
-  if (!ticket) return null
-  const label =
-    ticket.state === TICKET_STATE.SOLD
-      ? 'Active'
-      : ticket.state === TICKET_STATE.CHECKED_IN
-        ? 'Checked in'
-        : 'Refunded'
-  return (
-    <div className="card card-elev-2 stack">
-      <div className="row" style={{ justifyContent: 'space-between' }}>
-        <div>
-          <div className="mono">#{ticket.id}</div>
-          <div className="muted">{short(ticket.buyer)}</div>
-        </div>
-        <span
-          className={`tag ${
-            ticket.state === TICKET_STATE.SOLD
-              ? 'tag-success'
-              : ticket.state === TICKET_STATE.CHECKED_IN
-                ? 'tag-accent'
-                : 'tag-warning'
-          }`}
-        >
-          {label}
-        </span>
-      </div>
-      <TicketActions ticket={ticket} isOrganizer={false} refundCutoffPassed={refundCutoffPassed} />
     </div>
   )
 }
@@ -172,9 +177,4 @@ function StatMini({ label, value }: { label: string; value: string }) {
       </div>
     </div>
   )
-}
-
-function short(addr: string): string {
-  if (addr.length <= 14) return addr
-  return `${addr.slice(0, 6)}…${addr.slice(-4)}`
 }

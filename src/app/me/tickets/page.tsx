@@ -43,10 +43,14 @@ function MyTicketsInner() {
   }, [tickets.data])
 
   useEffect(() => {
-    if (!tickets.data) return
+    if (!tickets.data) {
+      setQrUrl({})
+      return
+    }
+    const activeTickets = tickets.data.filter((ticket) => ticket.state === TICKET_STATE.SOLD)
     void (async () => {
       const next: Record<number, string> = {}
-      for (const t of tickets.data!) {
+      for (const t of activeTickets) {
         try {
           const res = await fetch(`/api/checkin/token?ticket_id=${t.id}&event_id=${t.event_id}`)
           if (res.ok) {

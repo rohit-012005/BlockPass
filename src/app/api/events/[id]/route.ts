@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
 import { serverGetEvent } from '@/lib/server-contract'
+import { jsonError, jsonResponse } from '@/lib/api'
 
 export const runtime = 'nodejs'
 
@@ -11,16 +11,13 @@ export async function GET(_request: Request, ctx: Ctx) {
   const { id } = await ctx.params
   const eventId = Number(id)
   if (!Number.isFinite(eventId) || eventId <= 0) {
-    return NextResponse.json({ error: 'invalid event id' }, { status: 400 })
+    return jsonError('invalid event id')
   }
   try {
     const event = await serverGetEvent(eventId)
-    if (!event) return NextResponse.json({ error: 'event not found' }, { status: 404 })
-    return NextResponse.json(event)
+    if (!event) return jsonError('event not found', 404)
+    return jsonResponse(event)
   } catch (e) {
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'failed to read event' },
-      { status: 500 },
-    )
+    return jsonError(e instanceof Error ? e.message : 'failed to read event', 500)
   }
 }
