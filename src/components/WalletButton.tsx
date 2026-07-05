@@ -2,6 +2,7 @@
 
 import { useWallet } from '@/hooks/useWallet'
 import { shortAddress } from '@/lib/stellar'
+import { CopyButton } from '@/components/CopyButton'
 
 export function WalletButton() {
   const { address, isConnecting, connect, disconnect, isAvailable, error } = useWallet()
@@ -20,6 +21,7 @@ export function WalletButton() {
         <span className="tag" title={address}>
           {shortAddress(address, 6, 4)}
         </span>
+        <CopyButton value={address} label="Copy address" />
         <button className="btn btn-ghost" onClick={disconnect}>
           Disconnect
         </button>
