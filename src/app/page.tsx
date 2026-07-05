@@ -62,6 +62,25 @@ export default async function HomePage() {
 
       <section className="grid-2">
         <Feature
+          title="Start as organizer"
+          body="Create event, connect wallet, set capacity and refund cutoff, then share event link with buyers."
+        />
+        <Feature
+          title="Use it at the door"
+          body="Open scan page on mobile or laptop, verify QR token, then tap check-in once buyer arrives."
+        />
+        <Feature
+          title="Proof for reviewers"
+          body="The README now keeps architecture, deployment checklist, live links, screenshots, and feedback in one place."
+        />
+        <Feature
+          title="Quick entry points"
+          body="Create an event, view tickets, or open organizer dashboard from any page in one click."
+        />
+      </section>
+
+      <section className="grid-2">
+        <Feature
           title="Held in escrow, not in your wallet"
           body="Ticket money is transferred from the buyer into the contract via the Stellar Asset Contract. The organizer can't run off with it."
         />
