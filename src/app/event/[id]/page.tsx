@@ -4,8 +4,10 @@ import { serverGetEvent, serverGetEventStats, serverListEventTickets, serverGetT
 import { BuyTicketPanel } from '@/components/BuyTicketPanel'
 import { OrganizerActions } from '@/components/OrganizerActions'
 import { TicketActions } from '@/components/TicketActions'
+import { EventSharePanel } from '@/components/EventSharePanel'
 import { formatTokenAmount, formatUnixDateTime, eventStatusLabel, progressPercent } from '@/lib/format'
 import { EVENT_STATUS, TICKET_STATE } from '@/types'
+import { CONTRACT_ID } from '@/lib/stellar'
 
 interface Params {
   params: Promise<{ id: string }>
@@ -74,6 +76,8 @@ export default async function EventPage({ params }: Params) {
         />
         <OrganizerActions event={event} isOrganizer={false} />
       </div>
+
+      {CONTRACT_ID && <EventSharePanel eventId={eventId} contractId={CONTRACT_ID} />}
 
       <section className="card">
         <h2 className="h2">Tickets</h2>
