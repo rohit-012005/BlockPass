@@ -279,6 +279,7 @@ dd {
 
 .page-main {
   min-height: calc(100vh - 10rem);
+  padding-top: 0.6rem;
 }
 
 .container {
@@ -288,7 +289,7 @@ dd {
 }
 
 .stack > * + * {
-  margin-top: 1rem;
+  margin-top: 1.25rem;
 }
 
 .row {
@@ -634,7 +635,7 @@ dd {
 .surface-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  gap: 1rem;
+  gap: 1.35rem;
 }
 
 .span-7 {
@@ -665,6 +666,35 @@ dd {
 
 .feature-card {
   padding: 1.2rem;
+}
+
+.create-page > .hero {
+  margin-top: 0.35rem;
+}
+
+.create-layout {
+  align-items: start;
+}
+
+.create-form,
+.create-preview {
+  padding: 1.4rem;
+}
+
+.create-form > * + * {
+  margin-top: 1.35rem;
+}
+
+.create-preview > * + * {
+  margin-top: 1rem;
+}
+
+.field-group + .field-group {
+  margin-top: 1.15rem;
+}
+
+.field-group label {
+  margin-bottom: 0.65rem;
 }
 
 .timeline {
@@ -873,7 +903,7 @@ video {
 
 .landing-hero {
   padding: 2rem;
-  min-height: 44rem;
+  min-height: calc(100vh - 7rem);
 }
 
 .landing-grid-paper {
@@ -917,7 +947,7 @@ video {
   grid-template-columns: minmax(0, 1.06fr) minmax(340px, 0.94fr);
   gap: 1.5rem;
   align-items: center;
-  min-height: 40rem;
+  min-height: calc(100vh - 11rem);
 }
 
 .landing-copy {
@@ -1263,6 +1293,13 @@ video {
   margin-top: 1.45rem;
 }
 
+.landing-events-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.45rem;
+}
+
 .landing-feature-card {
   position: relative;
   min-height: 18rem;
@@ -1271,7 +1308,18 @@ video {
   background: rgba(255, 252, 246, 0.95);
 }
 
+.landing-event-card {
+  display: grid;
+  gap: 0.8rem;
+  min-height: 16rem;
+  padding: 1.35rem;
+  border-radius: 28px;
+  border: 2px solid rgba(32, 28, 23, 0.86);
+  box-shadow: 8px 8px 0 rgba(34, 28, 21, 0.12);
+}
+
 .landing-feature-card h3,
+.landing-event-card h3,
 .landing-showcase-copy h2,
 .landing-workflow-card h3,
 .landing-price-card h3 {
@@ -1289,6 +1337,27 @@ video {
 
 .landing-feature-card.yellow {
   background: #fff4c8;
+}
+
+.landing-event-card.mint {
+  background: #e8f6de;
+}
+
+.landing-event-card.lavender {
+  background: #ece4fb;
+}
+
+.landing-event-card.yellow {
+  background: #fff4c8;
+}
+
+.landing-inline-link {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2rem;
 }
 
 .landing-float-tag {
@@ -1570,6 +1639,7 @@ video {
   }
 
   .landing-feature-stack,
+  .landing-events-grid,
   .landing-testimonial-grid,
   .landing-pricing-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1628,6 +1698,7 @@ video {
   .landing-browser-grid,
   .landing-shot-body,
   .landing-feature-stack,
+  .landing-events-grid,
   .landing-workflow-grid,
   .landing-testimonial-grid,
   .landing-pricing-grid {

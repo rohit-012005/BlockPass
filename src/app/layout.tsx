@@ -60,11 +60,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <span className="brand-subtitle">Decentralized event escrow</span>
             </div>
             <nav className="site-nav" aria-label="Primary">
-              <Link href="/story">Story</Link>
-              <Link href="/product">Product</Link>
-              <Link href="/roadmap">Roadmap</Link>
+              <Link href="/#events">Events</Link>
               <Link href="/create">Create</Link>
-              <Link href="/organizer/dashboard">Dashboard</Link>
+              <Link href="/contact">Contact</Link>
             </nav>
             <div className="site-actions">
               <span
@@ -90,9 +88,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="muted">Built on Stellar · escrow, refunds, and check-in</div>
             </div>
             <div className="footer-links">
-              <Link href="/story">Story</Link>
-              <Link href="/product">Product</Link>
-              <Link href="/roadmap">Roadmap</Link>
+              <Link href="/#events">Events</Link>
+              <Link href="/create">Create</Link>
+              <Link href="/contact">Contact</Link>
               <a href={SOURCE_URL} rel="noreferrer noopener" target="_blank">
                 Source
               </a>

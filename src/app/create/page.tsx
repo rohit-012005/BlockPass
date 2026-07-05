@@ -112,7 +112,7 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="stack">
+    <div className="stack create-page">
       <section className="hero reveal">
         <div className="hero-grid">
           <div className="hero-copy stack">
@@ -146,8 +146,8 @@ export default function CreateEventPage() {
         </div>
       </section>
 
-      <section className="surface-grid">
-        <form onSubmit={onSubmit} className="surface span-8 stack">
+      <section className="surface-grid create-layout">
+        <form onSubmit={onSubmit} className="surface span-8 stack create-form">
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <div>
               <span className="eyebrow">Event details</span>
@@ -297,7 +297,7 @@ export default function CreateEventPage() {
           )}
         </form>
 
-        <aside className="surface span-4 stack">
+        <aside className="surface span-4 stack create-preview">
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <span className="eyebrow">Preview</span>
             <span className="tag tag-success">Auto-update</span>
@@ -336,7 +336,7 @@ function formatDatePreview(date: string, time: string): string {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div>
+    <div className="field-group">
       <label>{label}</label>
       {children}
     </div>
