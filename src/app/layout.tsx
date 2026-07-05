@@ -29,8 +29,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Suspense fallback={null}>
           <PageTelemetry />
         </Suspense>
-        <header className="container row" style={{ justifyContent: 'space-between', padding: '1rem 1.5rem' }}>
-          <div className="row" style={{ gap: '1.25rem' }}>
+        <header className="container app-header">
+          <div className="row app-header__brand" style={{ gap: '1.25rem' }}>
             <Link href="/" style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--text)' }}>
               BlockPass
             </Link>
@@ -44,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               Organizer
             </Link>
           </div>
-          <div className="row">
+          <div className="row app-header__actions">
             <span
               className={`tag ${isTestnet() ? 'tag-warning' : 'tag-success'}`}
               title={`Network: ${NETWORK.networkPassphrase}`}
