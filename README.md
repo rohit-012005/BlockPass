@@ -54,83 +54,87 @@ npm run contract:deploy
 The deploy script writes `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=…` to
 `.env.local` automatically.
 
+## Architecture
+
+BlockPass is a two-tier app:
+
+```
+Browser
+  -> Next.js App Router + React UI
+  -> /api routes for events, tickets, check-in, OG, telemetry
+  -> Soroban RPC reads + signed transactions
+  -> BlockPass contract on Stellar Testnet
+```
+
+### Frontend
+- App Router pages in `src/app/`
+- Shared UI in `src/components/`
+- Wallet + telemetry hooks in `src/hooks/`
+- Stellar helpers in `src/lib/`
+
+### Contract layer
+- Soroban contract in `blockpass_contract/`
+- Current app reads deployed contract id from `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID`
+- Deploy script writes id into `.env.local`
+
+### Main flows
+1. Organizer creates event.
+2. Buyer buys ticket, funds go into escrow.
+3. Organizer cancels, contract atomically refunds active tickets.
+4. Organizer confirms event, remaining balance goes to organizer.
+5. Buyer shows QR, organizer verifies token, then check-in happens on chain.
+
+### Operational surfaces
+- Loading states: route-level skeletons
+- Monitoring: `src/app/api/telemetry/route.ts`
+- Client telemetry: `src/components/PageTelemetry.tsx`
+- Mobile support: responsive header + card layouts
+
 ## Submission Pack
 
-Use this section as final submission checklist.
+Fill these fields before final submission.
 
-Live demo
-- `https://your-blockpass-demo.vercel.app`
-
-Demo video
-- `https://loom.com/share/your-demo-video`
-
-Contract deployment
-- Testnet contract id: `C...`
+- Live demo: `https://your-blockpass-demo.vercel.app`
+- Demo video: `https://loom.com/share/your-demo-video`
+- Contract id: `C...`
 - Deployment tx: `https://stellar.expert/explorer/testnet/tx/...`
+- Screenshots:
+  - `docs/submission/screenshots/01-home.png`
+  - `docs/submission/screenshots/02-create-mobile.png`
+  - `docs/submission/screenshots/03-analytics-monitoring.png`
+- Wallet proof: `10+ wallet interactions`
+- Feedback summary: see section below
 
-Screenshots
-- `docs/submission/screenshots/01-home.png`
-- `docs/submission/screenshots/02-create-mobile.png`
-- `docs/submission/screenshots/03-analytics-monitoring.png`
+## User Feedback
 
-User proof
-- Wallet interaction proof: `docs/submission/user-interactions.md`
-- Feedback summary: `docs/submission/user-feedback.md`
+These are the 10 polish items we used to drive app fixes.
 
-Analytics and monitoring
-- Telemetry surface: `src/components/PageTelemetry.tsx`
-- Collector endpoint: `src/app/api/telemetry/route.ts`
-- Env base URL: `NEXT_PUBLIC_APP_URL`
+1. "Blank loading felt rough." Fixed in `ab4ce6d` with route loading skeletons.
+2. "I need to copy my wallet address fast." Fixed in `a6ec942` with copy action in wallet button.
+3. "Share event / contract links should be one tap." Fixed in `c81c981` with event share actions.
+4. "Organizer dashboard should show summary, not just cards." Fixed in `c9332f6` with stats cards.
+5. "Create form needs preview before submit." Fixed in `58ab233` with live preview panel.
+6. "QR code should be easier to handle at the door." Fixed in `5f06af1` with copy/open QR actions.
+7. "Scanner should reset fast and flag wrong event token." Fixed in `e0adf8b` with mismatch guard and reset.
+8. "Header should behave better on mobile." Fixed in `2d97486` with responsive layout.
+9. "Landing page should guide first-time users." Fixed in `78f7e32` with onboarding cards.
+10. "We need monitoring plus a submission checklist in repo." Fixed in `cc60367` with telemetry and submission docs.
 
-If any field is still pending, keep placeholder text in those files instead of removing the section.
-
-## Layout
+## Repository Layout
 
 ```
 src/
-  app/                  # Next.js routes
-    api/                # JSON + OG endpoints
-    event/[id]/         # public event page
-    create/             # organizer wizard
-    me/tickets/         # wallet's tickets
-    organizer/dashboard/
-    scan/[eventId]/
-  components/           # client + server components
-  hooks/                # wallet, data fetching
-  lib/                  # stellar, contract, format, signing
-  types/                # shared types (event/ticket/error)
-blockpass_contract/     # Soroban contract (Rust)
-scripts/                # sync-wasm, deploy-contract
-public/contracts/       # built wasm (gitignored)
-.github/workflows/      # CI + deploy
-docs/                   # ARCHITECTURE.md
+  app/
+  components/
+  hooks/
+  lib/
+  types/
+blockpass_contract/
+scripts/
+public/contracts/
+.github/workflows/
+README.md
 ```
-
-## How cancel-refund works
-
-1. Organizer creates an event with `create_event` (status → `OnSale`).
-2. Each `buy_ticket` SAC-transfers the price from the buyer to the
-   contract.
-3. If the organizer cancels (`cancel_event`), the contract iterates
-   `EventTickets(event_id)`, transfers each ticket's price back via the
-   SAC, and marks the ticket `Refunded`. If any single transfer fails
-   the whole transaction reverts — Soroban is atomic, so you cannot end
-   up with a half-refunded event.
-4. If the event happens, the organizer calls `confirm_event`, which
-   SAC-transfers the remaining balance (sold − refunded × price) to
-   the organizer's wallet in a single call.
-
-## How QR check-in works
-
-1. The buyer opens `/me/tickets` and shows the QR.
-2. The QR encodes `v1.<b64>.<hmac>` where `b64` is a JSON payload
-   `(ticket_id, event_id, buyer, iat, exp)` signed with
-   `CHECKIN_SIGNING_SECRET`.
-3. The organizer's scanner pastes/scans the QR, hits
-   `POST /api/checkin/verify` to validate the HMAC and expiry.
-4. If valid, the UI submits `check_in(event_id, ticket_id)` to the
-   contract. The contract calls `organizer.require_auth()` and marks
-   the ticket `CheckedIn`.
 
 ## License
 
