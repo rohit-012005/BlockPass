@@ -24,6 +24,7 @@ import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import {
+  Account,
   Address,
   BASE_FEE,
   Contract,
@@ -129,7 +130,7 @@ async function deployContract(server, sourceKeypair, wasmHash, saltHex) {
 }
 
 async function readVersion(server, contractId) {
-  const account = new rpc.Account(Keypair.random().publicKey(), '0')
+  const account = new Account(Keypair.random().publicKey(), '0')
   const contract = new Contract(contractId)
   const tx = new TransactionBuilder(account, {
     fee: BASE_FEE,

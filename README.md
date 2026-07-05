@@ -151,13 +151,13 @@ The deploy script writes `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=…` to `.env.local`
 
 ## Contract Details
 
-| Field | Placeholder |
+| Field | Value |
 |---|---|
-| Contract ID | `C...` |
-| Deployment tx | `https://stellar.expert/explorer/testnet/tx/...` |
-| Explorer contract link | `https://stellar.expert/explorer/testnet/contract/...` |
+| Contract ID | `CASNRSLYQQ26YUCGFXTV7AGHV7NBFMEY42E6CYNL6ZQGT5EFZPXAHKV7` |
+| Deployment tx | `feaf73de28d49ee48f61a378260ddd94080303d77083ac83667bd9854e1540c8` |
+| Explorer contract link | `https://stellar.expert/explorer/testnet/contract/CASNRSLYQQ26YUCGFXTV7AGHV7NBFMEY42E6CYNL6ZQGT5EFZPXAHKV7` |
 | Network | `Stellar Testnet` |
-| Deployer account | `G...` |
+| Deployer account | `GAM66NWFLWHLDYEIX7XRJYVQK7MVV7ZFQ2F4IXYCCKAUHY5XR6QGC2LV` |
 | Contract version | `blockpass-0.1.0` |
 
 ## Live Links
@@ -187,7 +187,7 @@ The deploy script writes `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=…` to `.env.local`
 | README with architecture and checklist | Ready |
 | 15+ meaningful commits | Ready |
 | Live demo link | Placeholder |
-| Contract deployment address | Placeholder |
+| Contract deployment address | Ready |
 | Screenshots | Placeholder |
 | Demo video link | Placeholder |
 | Proof of 10+ wallet interactions | Placeholder |
