@@ -26,6 +26,7 @@ export default function OrganizerDashboard() {
   return (
     <div className="stack">
       <h1 className="h1">Organizer dashboard</h1>
+      {events.data && events.data.length > 0 && <DashboardStats items={events.data} />}
       <div className="row">
         <Link href="/create" className="btn btn-primary">
           + New event
@@ -73,6 +74,39 @@ export default function OrganizerDashboard() {
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+function DashboardStats({
+  items,
+}: {
+  items: { id: number; event: { sold: number; capacity: number; status: number } }[]
+}) {
+  const totalEvents = items.length
+  const activeEvents = items.filter(({ event }) => event.status === EVENT_STATUS.ON_SALE).length
+  const soldOutEvents = items.filter(({ event }) => event.status === EVENT_STATUS.SOLD_OUT).length
+  const totalSold = items.reduce((sum, { event }) => sum + event.sold, 0)
+
+  return (
+    <div className="grid-2">
+      <StatCard label="Events" value={String(totalEvents)} />
+      <StatCard label="Live" value={String(activeEvents)} accent />
+      <StatCard label="Sold out" value={String(soldOutEvents)} />
+      <StatCard label="Tickets sold" value={String(totalSold)} />
+    </div>
+  )
+}
+
+function StatCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div className="card">
+      <div className="muted" style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        {label}
+      </div>
+      <div className={accent ? 'tag tag-success' : 'mono'} style={{ marginTop: '0.35rem', fontSize: '1.1rem' }}>
+        {value}
+      </div>
     </div>
   )
 }
