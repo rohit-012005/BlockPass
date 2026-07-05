@@ -175,7 +175,7 @@ function TicketCard({
                 Show this code at the door. The organizer scans it with the check-in tool.
               </p>
               <div className="row" style={{ justifyContent: 'center' }}>
-                <CopyButton value={qrPayload} label="Copy QR token" />
+                <CopyButton value={qrPayload ?? ''} label="Copy QR token" />
                 <a className="btn btn-ghost" href={qrSrc} target="_blank" rel="noreferrer noopener">
                   Open QR image
                 </a>
