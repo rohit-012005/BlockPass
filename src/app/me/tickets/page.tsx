@@ -10,6 +10,7 @@ import type { EventRecord, TicketRecord } from '@/types'
 import { TICKET_STATE } from '@/types'
 import { formatTokenAmount, formatUnixDateTime, ticketStateLabel, eventStatusLabel } from '@/lib/format'
 import { CONTRACT_ID } from '@/lib/stellar'
+import { CopyButton } from '@/components/CopyButton'
 
 function MyTicketsInner() {
   const { address, connect } = useWallet()
@@ -173,6 +174,12 @@ function TicketCard({
               <p className="muted" style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>
                 Show this code at the door. The organizer scans it with the check-in tool.
               </p>
+              <div className="row" style={{ justifyContent: 'center' }}>
+                <CopyButton value={qrPayload} label="Copy QR token" />
+                <a className="btn btn-ghost" href={qrSrc} target="_blank" rel="noreferrer noopener">
+                  Open QR image
+                </a>
+              </div>
             </div>
           )}
         </div>
