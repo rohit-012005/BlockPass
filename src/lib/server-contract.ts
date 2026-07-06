@@ -215,6 +215,13 @@ export async function serverListOrganizerEvents(organizer: string): Promise<numb
   })
 }
 
+export async function serverListEvents(): Promise<number[]> {
+  return simulateRead('list_events', [], (raw) => {
+    if (!Array.isArray(raw)) return []
+    return raw.map((v) => toNumber(v))
+  })
+}
+
 function isNotFound(error: unknown): boolean {
   if (!(error instanceof Error)) return false
   const message = error.message

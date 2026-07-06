@@ -1,6 +1,6 @@
-import { z } from 'zod'
 import {
   serverGetEvent,
+  serverListEvents,
   serverListOrganizerEvents,
 } from '@/lib/server-contract'
 import { jsonError, jsonResponse } from '@/lib/api'
@@ -8,19 +8,16 @@ import { jsonError, jsonResponse } from '@/lib/api'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-const QuerySchema = z.object({
-  organizer: z.string().regex(/^G[A-Z2-7]{55}$/),
-})
-
 export async function GET(request: Request) {
   const url = new URL(request.url)
-  const parsed = QuerySchema.safeParse(Object.fromEntries(url.searchParams.entries()))
-  if (!parsed.success) {
-    return jsonError('organizer query is required')
+  const organizer = url.searchParams.get('organizer')
+  if (organizer && !/^G[A-Z2-7]{55}$/.test(organizer)) {
+    return jsonError('invalid organizer address', 400)
   }
-  const organizer = parsed.data.organizer
   try {
-    const ids = await serverListOrganizerEvents(organizer)
+    const ids = organizer
+      ? await serverListOrganizerEvents(organizer)
+      : await serverListEvents()
     const events = await Promise.all(
       ids.map(async (id) => {
         const ev = await serverGetEvent(id)

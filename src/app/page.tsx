@@ -1,6 +1,9 @@
 import Link from 'next/link'
+import type { EventRecord } from '@/types'
 import { CONTRACT_ID, isTestnet } from '@/lib/stellar'
 import { getContractVersion } from '@/lib/contract'
+import { serverGetEvent, serverListEvents } from '@/lib/server-contract'
+import { EventCard } from '@/components/EventCard'
 
 const pillars = [
   {
@@ -44,12 +47,19 @@ export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   let version: string | null = null
+  let events: { id: number; event: EventRecord }[] = []
 
   if (CONTRACT_ID) {
     try {
       version = await getContractVersion()
     } catch {
       version = null
+    }
+
+    try {
+      events = await loadPublicEvents()
+    } catch {
+      events = []
     }
   }
 
@@ -129,6 +139,31 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="surface p-6 md:p-7">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="space-y-3">
+            <span className="eyebrow">On-chain events</span>
+            <h2 className="section-title">Live listings from contract.</h2>
+          </div>
+          <p className="section-copy max-w-[38ch]">
+            These cards come straight from contract state. If a listing exists on-chain, it shows
+            here without needing a manual URL.
+          </p>
+        </div>
+
+        {events.length > 0 ? (
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {events.map(({ id, event }) => (
+              <EventCard key={id} event={event} />
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6 rounded-[24px] border border-[var(--border)] bg-white/70 p-6 text-[var(--text-dim)]">
+            No live events found on contract yet.
+          </div>
+        )}
+      </section>
+
       <section className="grid gap-4 lg:grid-cols-3">
         {pillars.map((pillar, index) => (
           <article key={pillar.title} className={`surface p-6 reveal ${index === 1 ? 'reveal-2' : ''} ${index === 2 ? 'reveal-3' : ''}`}>
@@ -183,4 +218,18 @@ function InfoCard({ label, value }: { label: string; value: string }) {
       <div className="mt-2 font-display text-[1.2rem] leading-none tracking-[-0.03em]">{value}</div>
     </div>
   )
+}
+
+async function loadPublicEvents(): Promise<{ id: number; event: EventRecord }[]> {
+  const ids = await serverListEvents().catch(() => [])
+  const events = await Promise.all(
+    ids
+      .slice()
+      .reverse()
+      .map(async (id) => {
+        const event = await serverGetEvent(id)
+        return event ? { id, event } : null
+      }),
+  )
+  return events.filter((entry): entry is { id: number; event: EventRecord } => entry !== null)
 }

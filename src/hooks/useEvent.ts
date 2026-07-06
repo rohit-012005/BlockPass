@@ -298,3 +298,34 @@ export function useOrganizerEvents(
 
   return { data, error, isLoading, refresh }
 }
+
+export function usePublicEvents(): FetchState<{ id: number; event: EventRecord }[]> {
+  const [data, setData] = useState<{ id: number; event: EventRecord }[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setLoading] = useState(false)
+
+  const refresh = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const json = await fetchJson<unknown[]>('/api/events')
+      setData(normalizeOrganizerEvents(json))
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Failed to load events'
+      setError(message)
+      console.error('[usePublicEvents] public events load failed', {
+        contractId: CONTRACT_ID,
+        error: message,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    void refresh()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return { data, error, isLoading, refresh }
+}

@@ -236,6 +236,10 @@ export async function listOrganizerEvents(organizer: string): Promise<number[]> 
   return readMethod('list_organizer_events', [scvAddress(organizer)], parseIdList)
 }
 
+export async function listEvents(): Promise<number[]> {
+  return readMethod('list_events', [], parseIdList)
+}
+
 export async function createEvent(
   input: CreateEventInput,
   organizer: string,

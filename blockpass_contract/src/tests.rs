@@ -438,6 +438,14 @@ fn list_organizer_events_returns_all() {
 }
 
 #[test]
+fn list_events_returns_all() {
+    let s = Setup::new();
+    let client = BlockPassContractClient::new(&s.env, &s.contract);
+    let ids = client.list_events();
+    assert_eq!(ids.len(), 1);
+}
+
+#[test]
 fn version_string() {
     let s = Setup::new();
     let client = BlockPassContractClient::new(&s.env, &s.contract);

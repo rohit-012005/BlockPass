@@ -4,13 +4,15 @@ import { useEffect } from 'react'
 import Link from 'next/link'
 import { EVENT_STATUS } from '@/types'
 import { useWallet } from '@/hooks/useWallet'
-import { useOrganizerEvents } from '@/hooks/useEvent'
+import { useOrganizerEvents, usePublicEvents } from '@/hooks/useEvent'
 import { formatUnixDateTime, eventStatusLabel, formatTokenAmount } from '@/lib/format'
 import { CONTRACT_ID, shortAddress } from '@/lib/stellar'
+import { EventCard } from '@/components/EventCard'
 
 export default function OrganizerDashboard() {
   const { address, connect } = useWallet()
   const { data, error, isLoading, refresh } = useOrganizerEvents(address)
+  const { data: publicEvents, error: publicError, isLoading: publicLoading } = usePublicEvents()
 
   useEffect(() => {
     if (!address) return
@@ -109,58 +111,94 @@ export default function OrganizerDashboard() {
       {isLoading && <p className="text-sm text-[var(--text-dim)]">Loading…</p>}
       {error && <div className="surface px-5 py-4 text-sm text-[#b94a4a]">{error}</div>}
 
-      {data && data.length === 0 && (
-        <section className="surface p-6 md:p-7">
-          <span className="eyebrow">Empty state</span>
-          <h2 className="mt-4 font-display text-[2rem] leading-none tracking-[-0.04em]">
-            No events yet
-          </h2>
-          <p className="section-copy mt-3">
-            Start with one event, then reuse the dashboard for future launches.
+      <section className="surface p-6 md:p-7">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="space-y-3">
+            <span className="eyebrow">Your events</span>
+            <h2 className="section-title">Connected wallet listing.</h2>
+          </div>
+          <p className="section-copy max-w-[40ch]">
+            This section reads contract by organizer address. If it is empty, connect wallet that
+            created event.
           </p>
-          <p className="mt-3 text-sm text-[var(--text-dim)]">
-            If you just created an event and do not see it here, make sure the same wallet is
-            connected. This view reads the contract by organizer address.
-          </p>
-          <Link
-            href="/create"
-            className="mt-5 inline-flex min-h-12 w-fit items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--accent),var(--accent-strong))] px-5 py-3 font-semibold text-[#14110f] shadow-[0_10px_24px_rgba(108,198,58,0.24)] transition hover:-translate-y-px"
-          >
-            Create your first event
-          </Link>
-        </section>
-      )}
-
-      {data && data.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2">
-          {data.map(({ id, event }) => (
-            <Link
-              href={`/event/${id}`}
-              key={id}
-              className="surface surface-strong block p-6 transition hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(52,38,20,0.16)]"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <span className={statusChip(event.status)}>{eventStatusLabel(event.status)}</span>
-                <span className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--text-dim)]">
-                  #{id}
-                </span>
-              </div>
-              <h3 className="mt-4 font-display text-[1.85rem] leading-none tracking-[-0.04em]">
-                {event.title}
-              </h3>
-              <p className="mt-3 m-0 text-sm text-[var(--text-dim)]">
-                {event.venue} · {formatUnixDateTime(event.starts_at)}
-              </p>
-              <div className="mt-4 flex items-center justify-between gap-3 text-sm text-[var(--text-dim)]">
-                <span>
-                  {event.sold} / {event.capacity} sold
-                </span>
-                <span className="font-mono">{formatTokenAmount(event.price, 7)} XLM</span>
-              </div>
-            </Link>
-          ))}
         </div>
-      )}
+
+        {data && data.length > 0 ? (
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {data.map(({ id, event }) => (
+              <Link
+                href={`/event/${id}`}
+                key={id}
+                className="surface surface-strong block p-6 transition hover:-translate-y-1 hover:shadow-[0_20px_48px_rgba(52,38,20,0.16)]"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <span className={statusChip(event.status)}>{eventStatusLabel(event.status)}</span>
+                  <span className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--text-dim)]">
+                    #{id}
+                  </span>
+                </div>
+                <h3 className="mt-4 font-display text-[1.85rem] leading-none tracking-[-0.04em]">
+                  {event.title}
+                </h3>
+                <p className="mt-3 m-0 text-sm text-[var(--text-dim)]">
+                  {event.venue} · {formatUnixDateTime(event.starts_at)}
+                </p>
+                <div className="mt-4 flex items-center justify-between gap-3 text-sm text-[var(--text-dim)]">
+                  <span>
+                    {event.sold} / {event.capacity} sold
+                  </span>
+                  <span className="font-mono">{formatTokenAmount(event.price, 7)} XLM</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6 rounded-[24px] border border-[var(--border)] bg-[rgba(255,252,247,0.85)] p-6">
+            <h3 className="font-display text-[1.55rem] leading-none tracking-[-0.03em]">
+              No events for this wallet yet.
+            </h3>
+            <p className="section-copy mt-3">
+              If you created event with another wallet, switch to that wallet or use public feed
+              below to confirm contract has listings.
+            </p>
+            <Link
+              href="/create"
+              className="mt-5 inline-flex min-h-12 w-fit items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--accent),var(--accent-strong))] px-5 py-3 font-semibold text-[#14110f] shadow-[0_10px_24px_rgba(108,198,58,0.24)] transition hover:-translate-y-px"
+            >
+              Create your first event
+            </Link>
+          </div>
+        )}
+      </section>
+
+      <section className="surface p-6 md:p-7">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="space-y-3">
+            <span className="eyebrow">Public feed</span>
+            <h2 className="section-title">All on-chain events.</h2>
+          </div>
+          <p className="section-copy max-w-[40ch]">
+            These events come from contract directly, so you can verify integration even before
+            wallet match.
+          </p>
+        </div>
+
+        {publicLoading && <p className="mt-6 text-sm text-[var(--text-dim)]">Loading public feed…</p>}
+        {publicError && <div className="mt-6 surface px-5 py-4 text-sm text-[#b94a4a]">{publicError}</div>}
+        {publicEvents && publicEvents.length > 0 ? (
+          <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {publicEvents.map(({ id, event }) => (
+              <EventCard key={id} event={event} />
+            ))}
+          </div>
+        ) : (
+          !publicLoading && (
+            <div className="mt-6 rounded-[24px] border border-[var(--border)] bg-[rgba(255,252,247,0.85)] p-6 text-[var(--text-dim)]">
+              No on-chain events yet.
+            </div>
+          )
+        )}
+      </section>
     </div>
   )
 }

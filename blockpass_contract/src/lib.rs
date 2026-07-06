@@ -710,6 +710,20 @@ impl BlockPassContract {
         list
     }
 
+    pub fn list_events(env: Env) -> Vec<u64> {
+        let count = get_event_count(&env);
+        let mut ids: Vec<u64> = Vec::new(&env);
+        let mut id = 1u64;
+        while id <= count {
+            ids.push_back(id);
+            id += 1;
+        }
+        if count > 0 {
+            bump_persistent(&env, &DataKey::EventCount);
+        }
+        ids
+    }
+
     // ─────────── version ───────────
 
     /// Returns a contract version string, used by the UI to surface a
