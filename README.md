@@ -171,31 +171,25 @@ The deploy script writes `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=…` to `.env.local`
 
 ## Screenshots
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+<div style="display: grid; grid-template-columns-2: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
   <figure style="margin: 0; padding: 12px; border: 1px solid #ddd; border-radius: 14px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-    <img src="screenshots/01-home.png" alt="Home page screenshot" style="width: 100%; height: auto; border-radius: 10px; display: block;" />
+    <img width="1876" height="1005"  src="https://github.com/user-attachments/assets/f434a599-d02a-442a-8c63-f9e80785da5a"
+ alt="Home page screenshot" style="width: 100%; height: auto; border-radius: 10px; display: block;" />
     <figcaption style="margin-top: 10px; font-size: 0.95rem;">Home page - landing page and value proposition</figcaption>
   </figure>
 
   <figure style="margin: 0; padding: 12px; border: 1px solid #ddd; border-radius: 14px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-    <img src="screenshots/02-create-mobile.png" alt="Create page mobile screenshot" style="width: 100%; height: auto; border-radius: 10px; display: block;" />
+   <img width="1876" height="1005" src="https://github.com/user-attachments/assets/07669457-4a97-4677-9ce6-b53c2aebdc22" 
+ alt="Create page mobile screenshot" style="width: 100%; height: auto; border-radius: 10px; display: block;" />
     <figcaption style="margin-top: 10px; font-size: 0.95rem;">Create page mobile - responsive form on phone size</figcaption>
   </figure>
 
   <figure style="margin: 0; padding: 12px; border: 1px solid #ddd; border-radius: 14px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-    <img src="screenshots/03-dashboard.png" alt="Organizer dashboard screenshot" style="width: 100%; height: auto; border-radius: 10px; display: block;" />
+   <img width="1876" height="1005" src="https://github.com/user-attachments/assets/a32ec86b-bd4d-4735-a259-d18e4e1989d7" 
+ alt="Organizer dashboard screenshot" style="width: 100%; height: auto; border-radius: 10px; display: block;" />
     <figcaption style="margin-top: 10px; font-size: 0.95rem;">Organizer dashboard - event stats and actions</figcaption>
   </figure>
 
-  <figure style="margin: 0; padding: 12px; border: 1px solid #ddd; border-radius: 14px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-    <img src="screenshots/04-ticket-qr.png" alt="Ticket QR screenshot" style="width: 100%; height: auto; border-radius: 10px; display: block;" />
-    <figcaption style="margin-top: 10px; font-size: 0.95rem;">Ticket QR - QR token and copy/open actions</figcaption>
-  </figure>
-
-  <figure style="margin: 0; padding: 12px; border: 1px solid #ddd; border-radius: 14px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
-    <img src="screenshots/05-monitoring.png" alt="Monitoring screenshot" style="width: 100%; height: auto; border-radius: 10px; display: block;" />
-    <figcaption style="margin-top: 10px; font-size: 0.95rem;">Monitoring - telemetry or basic analytics proof</figcaption>
-  </figure>
 </div>
 
 ## Submission Checklist
