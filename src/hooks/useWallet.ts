@@ -9,7 +9,7 @@
  * the signed base64 XDR.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { StellarWalletsKit, ModuleInterface } from '@creit.tech/stellar-wallets-kit'
 import { NETWORK } from '@/lib/stellar'
 import { trackEvent } from '@/lib/telemetry'
@@ -93,16 +93,40 @@ export function useWallet(): UseWalletState {
   const [isConnecting, setIsConnecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
+  const addressRef = useRef<string | null>(null)
+  const walletIdRef = useRef<string | null>(null)
+  const hasRefreshedRef = useRef(false)
+
+  useEffect(() => {
+    addressRef.current = address
+  }, [address])
+
+  useEffect(() => {
+    walletIdRef.current = walletId
+  }, [walletId])
+
+  const hardRefreshIfChanged = useCallback((nextAddress: string | null, nextWalletId: string | null) => {
+    if (!mounted) return
+    const addressChanged = addressRef.current && addressRef.current !== nextAddress
+    const walletChanged = walletIdRef.current && walletIdRef.current !== nextWalletId
+    if ((addressChanged || walletChanged) && !hasRefreshedRef.current) {
+      hasRefreshedRef.current = true
+      window.location.reload()
+    }
+  }, [mounted])
 
   const syncFromStorage = useCallback(() => {
     if (!isBrowser()) return
     try {
-      setAddress(window.localStorage.getItem('blockpass:wallet-address'))
-      setWalletId(window.localStorage.getItem('blockpass:wallet-id'))
+      const nextAddress = window.localStorage.getItem('blockpass:wallet-address')
+      const nextWalletId = window.localStorage.getItem('blockpass:wallet-id')
+      setAddress(nextAddress)
+      setWalletId(nextWalletId)
+      hardRefreshIfChanged(nextAddress, nextWalletId)
     } catch {
       // ignore
     }
-  }, [])
+  }, [hardRefreshIfChanged])
 
   useEffect(() => {
     if (!isBrowser()) return
@@ -154,6 +178,7 @@ export function useWallet(): UseWalletState {
           try {
             walletKit.setWallet(option.id)
             const { address: addr } = await walletKit.getAddress()
+            hardRefreshIfChanged(addr, option.id)
             setAddress(addr)
             setWalletId(option.id)
             persist(addr, option.id)
@@ -173,7 +198,7 @@ export function useWallet(): UseWalletState {
     } finally {
       setIsConnecting(false)
     }
-  }, [persist])
+  }, [hardRefreshIfChanged, persist])
 
   const disconnect = useCallback(() => {
     setAddress(null)

@@ -5,7 +5,7 @@ import './globals.css'
 import { Suspense } from 'react'
 import { PageTelemetry } from '@/components/PageTelemetry'
 import { WalletButton } from '@/components/WalletButton'
-import { CONTRACT_ID, isTestnet, NETWORK } from '@/lib/stellar'
+import { CONTRACT_ID } from '@/lib/stellar'
 
 const appUrl = readAppUrl()
 const fontDisplay = Fraunces({
@@ -41,13 +41,11 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const contractReady = CONTRACT_ID.length > 0
   const stellarConfig = {
-    rpcUrl: process.env.NEXT_PUBLIC_STELLAR_RPC_URL ?? NETWORK.rpcUrl,
-    horizonUrl: process.env.NEXT_PUBLIC_STELLAR_HORIZON_URL ?? NETWORK.horizonUrl,
-    networkPassphrase:
-      process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE ?? NETWORK.networkPassphrase,
-    explorerUrl: process.env.NEXT_PUBLIC_STELLAR_EXPLORER_URL ?? NETWORK.explorerUrl,
+    rpcUrl: process.env.NEXT_PUBLIC_STELLAR_RPC_URL || undefined,
+    horizonUrl: process.env.NEXT_PUBLIC_STELLAR_HORIZON_URL || undefined,
+    networkPassphrase: process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE || undefined,
+    explorerUrl: process.env.NEXT_PUBLIC_STELLAR_EXPLORER_URL || undefined,
     contractId: process.env.NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID ?? CONTRACT_ID,
   }
 
@@ -74,12 +72,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     On-chain escrow for small events
                   </span>
                 </Link>
-                <div className="hidden h-12 w-px bg-[rgba(35,28,21,0.12)] lg:block" />
-                <div className="hidden items-center gap-2 lg:flex">
-                  <span className="chip">{isTestnet() ? 'Testnet' : 'Mainnet'}</span>
-                  <span className="chip">{NETWORK.networkPassphrase.split(' ').slice(0, 2).join(' ')}</span>
-                  <span className="chip">{contractReady ? 'Contract live' : 'Contract missing'}</span>
-                </div>
               </div>
 
               <nav aria-label="Primary" className="flex flex-wrap items-center gap-2">
@@ -91,9 +83,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </nav>
 
               <div className="flex items-center gap-3">
-                <span className="hidden max-w-[14rem] rounded-full border border-[var(--border)] bg-[rgba(255,252,247,0.92)] px-3 py-2 text-xs uppercase tracking-[0.14em] text-[var(--text-dim)] lg:inline-flex">
-                  {contractReady ? 'Contract configured' : 'Set NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID'}
-                </span>
                 <WalletButton />
               </div>
             </div>

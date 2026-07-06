@@ -1,6 +1,5 @@
 'use client'
 
-import { CopyButton } from '@/components/CopyButton'
 import { useWallet } from '@/hooks/useWallet'
 import { shortAddress } from '@/lib/stellar'
 
@@ -26,7 +25,6 @@ export function WalletButton() {
           >
             {shortAddress(address, 6, 4)}
           </span>
-          <CopyButton value={address} label="Copy address" />
           <button
             className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border)] bg-[rgba(255,252,247,0.92)] px-4 py-3 font-semibold transition hover:-translate-y-px hover:border-[var(--border-strong)]"
             onClick={disconnect}

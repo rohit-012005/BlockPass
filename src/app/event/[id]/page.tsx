@@ -72,9 +72,15 @@ export default async function EventPage({ params, searchParams }: Params) {
   return (
     <div className="space-y-8">
       <section className="surface surface-strong overflow-hidden px-6 py-8 md:px-8 md:py-10">
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="eyebrow">Event page</span>
+          <Link href="/" className="chip">
+            Back to events
+          </Link>
+        </div>
+
+        <div className="mt-6 grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="space-y-5">
-            <span className="eyebrow">Event page</span>
             <div className="space-y-3">
               <h1 className="section-title max-w-[12ch]">{event.title}</h1>
               <p className="section-copy">{event.description}</p>
@@ -82,42 +88,27 @@ export default async function EventPage({ params, searchParams }: Params) {
             <div className="flex flex-wrap gap-2">
               <span className="chip">{eventStatusLabel(event.status)}</span>
               <span className="chip">{event.venue}</span>
-              <span className="chip">#{event.id}</span>
+              <span className="chip">Event #{event.id}</span>
             </div>
           </div>
 
-          <div className="surface bg-[rgba(255,252,247,0.96)] p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="m-0 text-xs uppercase tracking-[0.16em] text-[var(--text-dim)]">
-                  Quick facts
-                </p>
-                <h2 className="mt-2 font-display text-[1.65rem] leading-none tracking-[-0.04em]">
-                  Snapshot
-                </h2>
-              </div>
-              <Link href="/" className="chip">
-                All events
-              </Link>
-            </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <StatCard label="Price" value={`${formatTokenAmount(event.price, 7)} XLM`} />
-              <StatCard label="Capacity" value={String(event.capacity)} />
-              <StatCard label="Sold" value={String(sold)} />
-              <StatCard label="Checked in" value={String(checkedIn)} />
-            </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <StatCard label="Price" value={`${formatTokenAmount(event.price, 7)} XLM`} />
+            <StatCard label="Capacity" value={String(event.capacity)} />
+            <StatCard label="Sold" value={String(sold)} />
+            <StatCard label="Checked in" value={String(checkedIn)} />
           </div>
         </div>
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+      <section className="grid gap-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-6">
           <section className="surface p-6 md:p-7">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div className="space-y-2">
                 <span className="eyebrow">Overview</span>
                 <h2 className="font-display text-[2rem] leading-none tracking-[-0.04em]">
-                  Status at a glance
+                  Timeline and sales
                 </h2>
               </div>
               <span className="chip">Refund cutoff {formatUnixDateTime(event.refund_cutoff)}</span>
@@ -130,34 +121,27 @@ export default async function EventPage({ params, searchParams }: Params) {
                 />
               </div>
               <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <MiniDetail label="Schedule" value={formatUnixDateTime(event.starts_at)} />
+                <MiniDetail label="Starts" value={formatUnixDateTime(event.starts_at)} />
                 <MiniDetail label="Refund window" value={formatUnixDateTime(event.refund_cutoff)} />
               </div>
             </div>
             <div className="mt-5 rounded-[24px] border border-[var(--border)] bg-[rgba(255,252,247,0.92)] p-4 text-sm text-[var(--text-dim)]">
-              {sold} of {event.capacity} sold · {refunded} refunded · {checkedIn} checked in
+              {sold} sold · {refunded} refunded · {checkedIn} checked in · {Math.max(0, event.capacity - sold)} left
             </div>
           </section>
 
           <section className="surface p-6 md:p-7">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div className="space-y-2">
-                <span className="eyebrow">Attendance</span>
+                <span className="eyebrow">Share</span>
                 <h2 className="font-display text-[2rem] leading-none tracking-[-0.04em]">
-                  Event health
+                  Event link and contract
                 </h2>
               </div>
-              <span className="chip">{checkedIn} checked in</span>
+              <span className="chip">For guests and collaborators</span>
             </div>
-            <p className="section-copy mt-4">
-              Public page shows aggregate sales and check-in progress. Individual ticket ownership
-              stays private to wallet holder and organizer tools.
-            </p>
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <StatCard label="Tickets sold" value={String(sold)} />
-              <StatCard label="Refunded" value={String(refunded)} />
-              <StatCard label="Checked in" value={String(checkedIn)} />
-              <StatCard label="Remaining" value={String(Math.max(0, event.capacity - sold))} />
+            <div className="mt-5">
+              {CONTRACT_ID && <EventSharePanel eventId={eventId} contractId={CONTRACT_ID} />}
             </div>
           </section>
         </div>
@@ -166,13 +150,17 @@ export default async function EventPage({ params, searchParams }: Params) {
           <section className="surface p-6 md:p-7">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <span className="eyebrow">Actions</span>
+                <span className="eyebrow">Tickets</span>
                 <h2 className="mt-4 font-display text-[2rem] leading-none tracking-[-0.04em]">
-                  Buy or manage
+                  Buy ticket
                 </h2>
               </div>
-              <span className="chip">{canBuy ? 'Live' : 'Paused'}</span>
+              <span className="chip">{canBuy ? 'Open' : 'Closed'}</span>
             </div>
+            <p className="section-copy mt-4">
+              This is the public checkout area. Buyers see price, remaining capacity, and the
+              current sale state here.
+            </p>
             <div className="mt-5">
               <BuyTicketPanel
                 eventId={eventId}
@@ -187,14 +175,29 @@ export default async function EventPage({ params, searchParams }: Params) {
           <section className="surface p-6 md:p-7">
             <OrganizerActions event={event} />
           </section>
+
+          <section className="surface p-6 md:p-7">
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div>
+                <span className="eyebrow">Health</span>
+                <h2 className="mt-4 font-display text-[2rem] leading-none tracking-[-0.04em]">
+                  Event status
+                </h2>
+              </div>
+              <span className="chip">{checkedIn} checked in</span>
+            </div>
+            <p className="section-copy mt-4">
+              Public stats stay simple: sales, refunds, check-ins, and remaining seats.
+            </p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <StatCard label="Tickets sold" value={String(sold)} />
+              <StatCard label="Refunded" value={String(refunded)} />
+              <StatCard label="Checked in" value={String(checkedIn)} />
+              <StatCard label="Remaining" value={String(Math.max(0, event.capacity - sold))} />
+            </div>
+          </section>
         </div>
       </section>
-
-      {CONTRACT_ID && (
-        <section className="surface p-6 md:p-7">
-          <EventSharePanel eventId={eventId} contractId={CONTRACT_ID} />
-        </section>
-      )}
     </div>
   )
 }
