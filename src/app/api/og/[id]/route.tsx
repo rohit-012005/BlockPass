@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
-import { serverGetEvent } from '@/lib/server-contract'
 import { formatUnixDateTime, eventStatusLabel } from '@/lib/format'
+import type { EventStatusCode } from '@/types'
 
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
@@ -15,9 +15,22 @@ export async function GET(_request: Request, ctx: Ctx) {
   if (!Number.isFinite(eventId) || eventId <= 0) {
     return new Response('Invalid event id', { status: 400 })
   }
-  const event = await serverGetEvent(eventId)
-  if (!event) {
+  const eventUrl = new URL(`/api/events/${eventId}`, _request.url)
+  const res = await fetch(eventUrl, { cache: 'no-store' })
+  if (res.status === 404) {
     return new Response('Event not found', { status: 404 })
+  }
+  if (!res.ok) {
+    return new Response('Failed to load event', { status: 502 })
+  }
+  const event = (await res.json()) as {
+    title: string
+    venue: string
+    description: string
+    starts_at: number
+    sold: number
+    capacity: number
+    status: number
   }
   return new ImageResponse(
     (
@@ -54,7 +67,7 @@ export async function GET(_request: Request, ctx: Ctx) {
             color: '#a1a1aa',
           }}
         >
-          <div>{eventStatusLabel(event.status)}</div>
+          <div>{eventStatusLabel(event.status as EventStatusCode)}</div>
           <div>
             {event.sold} / {event.capacity} sold
           </div>
