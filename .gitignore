@@ -40,7 +40,6 @@ yarn-error.log*
 
 # rust / soroban
 blockpass_contract/target
-blockpass_contract/Cargo.lock
 *.wasm
 !public/contracts/.gitkeep
 
