@@ -47,16 +47,6 @@ export function OrganizerActions({ event }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <span className="chip">Organizer tools</span>
-          <h3 className="mt-3 font-display text-[1.8rem] leading-none tracking-[-0.04em]">
-            Organizer controls
-          </h3>
-        </div>
-        <span className="chip bg-[rgba(145,216,79,0.14)]">Action center</span>
-      </div>
-
       <p className="m-0 text-sm leading-7 text-[var(--text-dim)]">You are the organizer of this event.</p>
 
       <div className="flex flex-wrap gap-3">

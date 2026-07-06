@@ -56,15 +56,9 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
   if (!canBuy) {
     return (
       <div className="space-y-4">
-        <span className="chip">Tickets</span>
-        <div>
-          <h3 className="mt-3 font-display text-[1.8rem] leading-none tracking-[-0.04em]">
-            Tickets unavailable
-          </h3>
-          <p className="mt-3 m-0 text-sm text-[var(--text-dim)]">
-            This event is not currently accepting ticket purchases.
-          </p>
-        </div>
+        <p className="m-0 text-sm text-[var(--text-dim)]">
+          This event is not currently accepting ticket purchases.
+        </p>
         <span className="chip bg-[rgba(239,190,116,0.18)]">Status code: {status}</span>
       </div>
     )
@@ -72,16 +66,6 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <span className="chip">Checkout</span>
-          <h3 className="mt-3 font-display text-[1.8rem] leading-none tracking-[-0.04em]">
-            Buy a ticket
-          </h3>
-        </div>
-        <span className="chip bg-[rgba(145,216,79,0.14)]">Open</span>
-      </div>
-
       <p className="m-0 text-sm leading-7 text-[var(--text-dim)]">
         Funds are held in the BlockPass contract and refunded automatically if the organizer
         cancels.
