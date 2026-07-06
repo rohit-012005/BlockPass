@@ -2,6 +2,11 @@ export interface TelemetryPayload {
   path?: string
   referrer?: string
   walletId?: string
+  address?: string
+  contractId?: string
+  method?: string
+  status?: string
+  step?: string
   eventId?: number
   ticketId?: number
   error?: string

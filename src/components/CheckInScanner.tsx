@@ -19,7 +19,7 @@ interface Props {
   onCheckIn: (ticketId: number) => Promise<void>
 }
 
-export function CheckInScanner({ eventId, onCheckIn }: Props) {
+export function CheckInScanner({ eventId, organizer: _organizer, onCheckIn }: Props) {
   const [code, setCode] = useState('')
   const [verify, setVerify] = useState<VerifyResult | null>(null)
   const [busy, setBusy] = useState(false)
@@ -76,48 +76,79 @@ export function CheckInScanner({ eventId, onCheckIn }: Props) {
   }
 
   return (
-    <div className="stack">
-      <div className="row" style={{ justifyContent: 'space-between' }}>
+    <div className="space-y-4">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <span className="eyebrow">Scanner</span>
-          <h2 className="h2" style={{ marginTop: '0.6rem' }}>
+          <span className="chip">Scanner</span>
+          <h3 className="mt-3 font-display text-[1.8rem] leading-none tracking-[-0.04em]">
             Door check-in
-          </h2>
+          </h3>
         </div>
-        <span className="tag tag-accent">Event #{eventId}</span>
+        <span className="chip">Event #{eventId}</span>
       </div>
-      <p className="muted">
+      <p className="m-0 text-sm leading-7 text-[var(--text-dim)]">
         Paste or scan a ticket QR token. The server validates the HMAC signature before the
-        on-chain <span className="mono">check_in</span> call goes through.
+        on-chain <span className="font-mono">check_in</span> call goes through.
       </p>
+
       <textarea
-        rows={3}
+        rows={4}
+        className="rounded-[22px] border border-[var(--border)] bg-[rgba(255,252,247,0.96)] px-4 py-3 outline-none transition focus:border-[rgba(108,198,58,0.9)] focus:shadow-[0_0_0_4px_rgba(145,216,79,0.18)]"
         placeholder="v1.eyJ0aWNrZXRfaWQiOi4uLn0.signature"
         value={code}
         onChange={(e) => setCode(e.target.value)}
       />
-      <div className="row">
-        <button className="btn btn-ghost" onClick={onVerify} disabled={busy || !code.trim()}>
+
+      <div className="flex flex-wrap gap-3">
+        <button
+          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border)] bg-[rgba(255,252,247,0.92)] px-4 py-3 font-semibold transition hover:-translate-y-px hover:border-[var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+          onClick={onVerify}
+          disabled={busy || !code.trim()}
+        >
           Verify token
         </button>
-        <button className="btn btn-ghost" onClick={onReset} disabled={busy && !code.trim()}>
+        <button
+          className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border)] bg-[rgba(255,252,247,0.92)] px-4 py-3 font-semibold transition hover:-translate-y-px hover:border-[var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-60"
+          onClick={onReset}
+          disabled={busy && !code.trim()}
+        >
           Reset
         </button>
         {verify?.ok && verify.payload && (
-          <button className="btn btn-success" onClick={onConfirm} disabled={busy}>
+          <button
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--accent),var(--accent-strong))] px-4 py-3 font-semibold text-[#14110f] shadow-[0_10px_24px_rgba(108,198,58,0.24)] transition hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={onConfirm}
+            disabled={busy}
+          >
             Check in ticket #{verify.payload.ticket_id}
           </button>
         )}
       </div>
-      {verify && !verify.ok && <div className="notice notice-error">Invalid: {verify.error}</div>}
-      {verify?.ok && verify.payload && (
-        <div className="notice">
-          Valid token for event #{verify.payload.event_id} · ticket #{verify.payload.ticket_id} for buyer{' '}
-          <span className="mono">{verify.payload.buyer}</span>
+
+      {verify && !verify.ok && (
+        <div className="rounded-[24px] border border-[rgba(220,72,72,0.24)] bg-[rgba(255,240,240,0.92)] p-4 text-sm text-[#b94a4a]">
+          Invalid: {verify.error}
         </div>
       )}
-      {error && <div className="notice notice-error">{error}</div>}
-      {success && <div className="notice notice-success">{success}</div>}
+
+      {verify?.ok && verify.payload && (
+        <div className="rounded-[24px] border border-[var(--border)] bg-[rgba(255,252,247,0.92)] p-4 text-sm text-[var(--text)]">
+          Valid token for event #{verify.payload.event_id} · ticket #{verify.payload.ticket_id} for buyer{' '}
+          <span className="font-mono break-all">{verify.payload.buyer}</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="rounded-[24px] border border-[rgba(220,72,72,0.24)] bg-[rgba(255,240,240,0.92)] p-4 text-sm text-[#b94a4a]">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="rounded-[24px] border border-[rgba(108,198,58,0.24)] bg-[rgba(145,216,79,0.08)] p-4 text-sm text-[var(--text)]">
+          {success}
+        </div>
+      )}
     </div>
   )
 }

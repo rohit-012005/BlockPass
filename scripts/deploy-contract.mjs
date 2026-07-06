@@ -33,7 +33,6 @@ import {
   Operation,
   rpc,
   scValToNative,
-  StrKey,
   TransactionBuilder,
 } from '@stellar/stellar-sdk'
 
@@ -68,7 +67,7 @@ function log(step, message) {
   console.info(`▶ ${step}: ${message}`)
 }
 
-async function getSourceKeypair(server) {
+async function getSourceKeypair(_server) {
   const secret = process.env.STELLAR_DEPLOYER_SECRET
   if (secret) {
     return { keypair: Keypair.fromSecret(secret), generated: false }
@@ -193,9 +192,7 @@ async function main() {
 
   const deployment = await deployContract(server, keypair, wasmHash, upload.hash)
   if (!deployment.returnValue) fail('Deploy returned no contract address')
-  const contractId = StrKey.encodeContract(
-    Address.fromScAddress(deployment.returnValue.address()).toBuffer(),
-  )
+  const contractId = Address.fromScAddress(deployment.returnValue.address()).toString()
   log('done', `Contract deployed at ${contractId}`)
 
   const version = await readVersion(server, contractId)
@@ -215,8 +212,8 @@ async function main() {
     contractId,
     version,
   }
-  console.log('\nDeployment summary:')
-  console.log(JSON.stringify(output, null, 2))
+  console.info('\nDeployment summary:')
+  console.info(JSON.stringify(output, null, 2))
 }
 
 main().catch((e) => {

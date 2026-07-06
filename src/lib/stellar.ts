@@ -12,6 +12,16 @@ export interface StellarNetwork {
   explorerUrl: string
 }
 
+export interface StellarConfig extends StellarNetwork {
+  contractId: string
+}
+
+declare global {
+  interface Window {
+    __BLOCKPASS_STELLAR_CONFIG__?: Partial<StellarConfig>
+  }
+}
+
 export const STELLAR_TESTNET: StellarNetwork = {
   rpcUrl: 'https://soroban-testnet.stellar.org',
   horizonUrl: 'https://horizon-testnet.stellar.org',
@@ -32,21 +42,46 @@ function readEnv(key: string, fallback: string): string {
   return fallback
 }
 
+function readBrowserConfig(): Partial<StellarConfig> {
+  if (typeof window === 'undefined') return {}
+  return window.__BLOCKPASS_STELLAR_CONFIG__ ?? {}
+}
+
+function readRuntimeConfig(): StellarConfig {
+  const browser = readBrowserConfig()
+  return {
+    rpcUrl:
+      browser.rpcUrl ?? readEnv('NEXT_PUBLIC_STELLAR_RPC_URL', STELLAR_TESTNET.rpcUrl),
+    horizonUrl:
+      browser.horizonUrl ?? readEnv('NEXT_PUBLIC_STELLAR_HORIZON_URL', STELLAR_TESTNET.horizonUrl),
+    networkPassphrase:
+      browser.networkPassphrase ??
+      readEnv('NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE', STELLAR_TESTNET.networkPassphrase),
+    explorerUrl:
+      browser.explorerUrl ?? readEnv('NEXT_PUBLIC_STELLAR_EXPLORER_URL', STELLAR_TESTNET.explorerUrl),
+    contractId:
+      browser.contractId ?? process.env.NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID ?? '',
+  }
+}
+
+const STELLAR_CONFIG = readRuntimeConfig()
+
 export const NETWORK: StellarNetwork = {
-  rpcUrl: readEnv('NEXT_PUBLIC_STELLAR_RPC_URL', STELLAR_TESTNET.rpcUrl),
-  horizonUrl: readEnv('NEXT_PUBLIC_STELLAR_HORIZON_URL', STELLAR_TESTNET.horizonUrl),
-  networkPassphrase: readEnv(
-    'NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE',
-    STELLAR_TESTNET.networkPassphrase,
-  ),
-  explorerUrl: readEnv('NEXT_PUBLIC_STELLAR_EXPLORER_URL', STELLAR_TESTNET.explorerUrl),
+  rpcUrl: STELLAR_CONFIG.rpcUrl,
+  horizonUrl: STELLAR_CONFIG.horizonUrl,
+  networkPassphrase: STELLAR_CONFIG.networkPassphrase,
+  explorerUrl: STELLAR_CONFIG.explorerUrl,
 }
 
 export function isTestnet(): boolean {
   return NETWORK.networkPassphrase === STELLAR_TESTNET.networkPassphrase
 }
 
-export const CONTRACT_ID: string = readEnv('NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID', '')
+export const CONTRACT_ID: string = STELLAR_CONFIG.contractId
+
+export const NATIVE_XLM_ASSET_ID: string = isTestnet()
+  ? 'CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC'
+  : 'CAS3J7GYLGXMF6TDJBBYYSE3HQ6BBSMLNUQ34T6TZMYMW2EVH34XOWMA'
 
 export function explorerAccountUrl(address: string): string {
   return `${NETWORK.explorerUrl}/account/${address}`

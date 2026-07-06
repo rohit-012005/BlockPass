@@ -183,6 +183,12 @@ fn bump_persistent(env: &Env, key: &DataKey) {
         .extend_ttl(key, PERSISTENT_LIFETIME_THRESHOLD, PERSISTENT_BUMP_AMOUNT);
 }
 
+fn bump_persistent_if_exists(env: &Env, key: &DataKey) {
+    if env.storage().persistent().get::<_, Vec<u64>>(key).is_some() {
+        bump_persistent(env, key);
+    }
+}
+
 fn get_event(env: &Env, event_id: u64) -> Event {
     env.storage()
         .persistent()
@@ -515,7 +521,7 @@ impl BlockPassContract {
             .persistent()
             .get(&key)
             .unwrap_or_else(|| Vec::new(&env));
-        bump_persistent(&env, &key);
+        bump_persistent_if_exists(&env, &key);
 
         for tid in tickets.iter() {
             let mut ticket = get_ticket(&env, tid);
@@ -636,7 +642,7 @@ impl BlockPassContract {
             .persistent()
             .get(&key)
             .unwrap_or_else(|| Vec::new(&env));
-        bump_persistent(&env, &key);
+        bump_persistent_if_exists(&env, &key);
 
         let mut checked_in: u32 = 0;
         let mut active_sold: u32 = 0;
@@ -678,7 +684,7 @@ impl BlockPassContract {
             .persistent()
             .get(&key)
             .unwrap_or_else(|| Vec::new(&env));
-        bump_persistent(&env, &key);
+        bump_persistent_if_exists(&env, &key);
         list
     }
 
@@ -689,7 +695,7 @@ impl BlockPassContract {
             .persistent()
             .get(&key)
             .unwrap_or_else(|| Vec::new(&env));
-        bump_persistent(&env, &key);
+        bump_persistent_if_exists(&env, &key);
         list
     }
 
@@ -700,7 +706,7 @@ impl BlockPassContract {
             .persistent()
             .get(&key)
             .unwrap_or_else(|| Vec::new(&env));
-        bump_persistent(&env, &key);
+        bump_persistent_if_exists(&env, &key);
         list
     }
 

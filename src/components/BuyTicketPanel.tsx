@@ -24,24 +24,12 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<{ hash: string; ticketId: number } | null>(null)
 
-  if (!canBuy) {
-    return (
-      <div className="stack">
-        <span className="eyebrow">Tickets</span>
-        <h2 className="h2" style={{ marginTop: '0.4rem' }}>
-          Tickets unavailable
-        </h2>
-        <p className="muted">This event is not currently accepting ticket purchases.</p>
-        <span className="tag tag-warning">Status code: {status}</span>
-      </div>
-    )
-  }
-
   const onBuy = async () => {
     if (!address) {
       await connect()
       return
     }
+
     setBusy(true)
     setError(null)
     try {
@@ -51,11 +39,10 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
         eventId,
         ticketId: result.ticketId,
       })
-      // bounce user to their ticket page
       router.push(`/me/tickets?just=${result.ticketId}`)
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Failed to buy ticket'
-      const decoded = decodeFromMessage(msg)
+      const message = e instanceof Error ? e.message : 'Failed to buy ticket'
+      const decoded = decodeFromMessage(message)
       setError(decoded)
       void trackEvent('buy_ticket_error', {
         eventId,
@@ -66,48 +53,69 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
     }
   }
 
-  return (
-    <div className="stack">
-      <div className="row" style={{ justifyContent: 'space-between' }}>
+  if (!canBuy) {
+    return (
+      <div className="space-y-4">
+        <span className="chip">Tickets</span>
         <div>
-          <span className="eyebrow">Checkout</span>
-          <h2 className="h2" style={{ marginTop: '0.5rem' }}>
-            Buy a ticket
-          </h2>
+          <h3 className="mt-3 font-display text-[1.8rem] leading-none tracking-[-0.04em]">
+            Tickets unavailable
+          </h3>
+          <p className="mt-3 m-0 text-sm text-[var(--text-dim)]">
+            This event is not currently accepting ticket purchases.
+          </p>
         </div>
-        <span className="tag tag-success">Open</span>
+        <span className="chip bg-[rgba(239,190,116,0.18)]">Status code: {status}</span>
       </div>
-      <p className="muted">
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <span className="chip">Checkout</span>
+          <h3 className="mt-3 font-display text-[1.8rem] leading-none tracking-[-0.04em]">
+            Buy a ticket
+          </h3>
+        </div>
+        <span className="chip bg-[rgba(145,216,79,0.14)]">Open</span>
+      </div>
+
+      <p className="m-0 text-sm leading-7 text-[var(--text-dim)]">
         Funds are held in the BlockPass contract and refunded automatically if the organizer
         cancels.
       </p>
-      <div className="notice">
-        <div className="row" style={{ justifyContent: 'space-between' }}>
-          <span className="muted">Price</span>
-          <span className="mono">{price.toString()} (raw units)</span>
-        </div>
+
+      <div className="grid gap-3">
+        <InfoRow label="Price" value={`${price.toString()} (raw units)`} />
+        {stats.data && (
+          <InfoRow
+            label="Remaining"
+            value={`${Math.max(0, stats.data.capacity - stats.data.sold)} / ${stats.data.capacity}`}
+          />
+        )}
       </div>
-      {stats.data && (
-        <div className="notice">
-          <div className="row" style={{ justifyContent: 'space-between' }}>
-            <span className="muted">Remaining</span>
-            <span className="mono">
-              {Math.max(0, stats.data.capacity - stats.data.sold)} / {stats.data.capacity}
-            </span>
-          </div>
+
+      {address === organizer && (
+        <div className="rounded-[24px] border border-[rgba(239,190,116,0.22)] bg-[rgba(239,190,116,0.1)] p-4 text-sm text-[var(--text)]">
+          You are the organizer. Use the dashboard to test the contract.
         </div>
       )}
-      {address === organizer && (
-        <div className="notice notice-error">You are the organizer. Use the dashboard to test the contract.</div>
-      )}
+
       {address && address !== organizer && (
-        <button className="btn btn-primary" onClick={onBuy} disabled={isBusy}>
+        <button
+          className="inline-flex min-h-12 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--accent),var(--accent-strong))] px-5 py-3 font-semibold text-[#14110f] shadow-[0_10px_24px_rgba(108,198,58,0.24)] transition hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
+          onClick={onBuy}
+          disabled={isBusy}
+        >
           {isBusy ? 'Submitting…' : 'Buy ticket'}
         </button>
       )}
+
       {!address && (
         <button
-          className="btn btn-primary"
+          className="inline-flex min-h-12 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--accent),var(--accent-strong))] px-5 py-3 font-semibold text-[#14110f] shadow-[0_10px_24px_rgba(108,198,58,0.24)] transition hover:-translate-y-px"
           onClick={() => {
             void trackEvent('wallet_connect_click', { eventId })
             void connect()
@@ -116,12 +124,27 @@ export function BuyTicketPanel({ eventId, organizer, status, canBuy, price }: Pr
           Connect wallet to buy
         </button>
       )}
-      {error && <div className="notice notice-error">{error}</div>}
-      {success && (
-        <div className="notice notice-success">
-          Ticket #{success.ticketId} purchased. Tx: <span className="mono">{success.hash}</span>
+
+      {error && (
+        <div className="rounded-[24px] border border-[rgba(220,72,72,0.24)] bg-[rgba(255,240,240,0.92)] p-4 text-sm text-[#b94a4a]">
+          {error}
         </div>
       )}
+
+      {success && (
+        <div className="rounded-[24px] border border-[rgba(108,198,58,0.24)] bg-[rgba(145,216,79,0.08)] p-4 text-sm text-[var(--text)]">
+          Ticket #{success.ticketId} purchased. Tx: <span className="font-mono break-all">{success.hash}</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function InfoRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3 rounded-[24px] border border-[var(--border)] bg-[rgba(255,252,247,0.92)] px-4 py-3">
+      <span className="text-sm text-[var(--text-dim)]">{label}</span>
+      <span className="font-mono text-sm text-right">{value}</span>
     </div>
   )
 }

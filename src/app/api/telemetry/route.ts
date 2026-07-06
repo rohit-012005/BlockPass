@@ -8,6 +8,11 @@ const TelemetrySchema = z.object({
       path: z.string().trim().max(512).optional(),
       referrer: z.string().trim().max(512).optional(),
       walletId: z.string().trim().max(64).optional(),
+      address: z.string().trim().max(64).optional(),
+      contractId: z.string().trim().max(64).optional(),
+      method: z.string().trim().max(64).optional(),
+      status: z.string().trim().max(64).optional(),
+      step: z.string().trim().max(64).optional(),
       eventId: z.number().int().positive().optional(),
       ticketId: z.number().int().positive().optional(),
       error: z.string().trim().max(500).optional(),
@@ -34,3 +39,4 @@ export async function POST(request: Request) {
   console.info('[telemetry]', JSON.stringify(parsed.data))
   return jsonResponse({ ok: true }, { status: 202 })
 }
+export const dynamic = 'force-dynamic'

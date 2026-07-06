@@ -3,6 +3,7 @@ import { serverGetEvent } from '@/lib/server-contract'
 import { formatUnixDateTime, eventStatusLabel } from '@/lib/format'
 
 export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
 
 interface Ctx {
   params: Promise<{ id: string }>

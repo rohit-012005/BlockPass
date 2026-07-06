@@ -3,6 +3,7 @@ import { verifyCheckInToken } from '@/lib/checkin-token'
 import { jsonResponse } from '@/lib/api'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 const BodySchema = z.object({
   token: z.string().min(8),

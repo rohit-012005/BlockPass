@@ -2,6 +2,7 @@ import { serverGetEventStats } from '@/lib/server-contract'
 import { jsonError, jsonResponse } from '@/lib/api'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 interface Ctx {
   params: Promise<{ id: string }>
@@ -18,6 +19,8 @@ export async function GET(_request: Request, ctx: Ctx) {
     if (!stats) return jsonError('event not found', 404)
     return jsonResponse(stats)
   } catch (e) {
-    return jsonError(e instanceof Error ? e.message : 'failed to read stats', 500)
+    const message = e instanceof Error ? e.message : 'failed to read stats'
+    console.error('[api/events/:id/stats]', { eventId, error: message })
+    return jsonError(message, 500)
   }
 }

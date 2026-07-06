@@ -28,37 +28,41 @@ export function OrganizerActions({ event }: Props) {
     event.status === EVENT_STATUS.CONFIRMED
   const canCancel = canConfirm
 
-  const wrap = (label: string, action: () => Promise<{ hash: string }>) => async () => {
-    if (!confirm(`${label}? This is a real on-chain action.`)) return
-    setBusy(true)
-    setError(null)
-    try {
-      const result = await action()
-      setLastTx(result.hash)
-      router.refresh()
-    } catch (e) {
-      setError(e instanceof Error ? e.message : `Failed to ${label.toLowerCase()}`)
-    } finally {
-      setBusy(false)
+  const wrap =
+    (label: string, action: () => Promise<{ hash: string }>) =>
+    async () => {
+      if (!confirm(`${label}? This is a real on-chain action.`)) return
+      setBusy(true)
+      setError(null)
+      try {
+        const result = await action()
+        setLastTx(result.hash)
+        router.refresh()
+      } catch (e) {
+        setError(e instanceof Error ? e.message : `Failed to ${label.toLowerCase()}`)
+      } finally {
+        setBusy(false)
+      }
     }
-  }
 
   return (
-    <div className="stack">
-      <div className="row" style={{ justifyContent: 'space-between' }}>
+    <div className="space-y-4">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <span className="eyebrow">Organizer tools</span>
-          <h2 className="h2" style={{ marginTop: '0.5rem' }}>
+          <span className="chip">Organizer tools</span>
+          <h3 className="mt-3 font-display text-[1.8rem] leading-none tracking-[-0.04em]">
             Organizer controls
-          </h2>
+          </h3>
         </div>
-        <span className="tag tag-accent">Action center</span>
+        <span className="chip bg-[rgba(145,216,79,0.14)]">Action center</span>
       </div>
-      <p className="muted">You are the organizer of this event.</p>
-      <div className="row" style={{ gap: '0.5rem' }}>
+
+      <p className="m-0 text-sm leading-7 text-[var(--text-dim)]">You are the organizer of this event.</p>
+
+      <div className="flex flex-wrap gap-3">
         {canClose && (
           <button
-            className="btn btn-ghost"
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-[var(--border)] bg-[rgba(255,252,247,0.92)] px-4 py-3 font-semibold transition hover:-translate-y-px hover:border-[var(--border-strong)] disabled:cursor-not-allowed disabled:opacity-60"
             disabled={busy}
             onClick={wrap('Close sales', () => closeSales(event.id, address, signTransaction))}
           >
@@ -67,7 +71,7 @@ export function OrganizerActions({ event }: Props) {
         )}
         {canConfirm && (
           <button
-            className="btn btn-success"
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,#8ddf72,#5cbf4b)] px-4 py-3 font-semibold text-[#103013] shadow-[0_10px_24px_rgba(92,191,75,0.22)] transition hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
             disabled={busy}
             onClick={wrap('Confirm event and withdraw', () => confirmEvent(event.id, address, signTransaction))}
           >
@@ -76,7 +80,7 @@ export function OrganizerActions({ event }: Props) {
         )}
         {canCancel && (
           <button
-            className="btn btn-danger"
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-[linear-gradient(135deg,#ffb3b3,#f06b6b)] px-4 py-3 font-semibold text-[#3d0f0f] shadow-[0_10px_24px_rgba(240,107,107,0.18)] transition hover:-translate-y-px disabled:cursor-not-allowed disabled:opacity-60"
             disabled={busy}
             onClick={wrap('Cancel event (refund everyone)', () => cancelEvent(event.id, address, signTransaction))}
           >
@@ -84,10 +88,15 @@ export function OrganizerActions({ event }: Props) {
           </button>
         )}
       </div>
-      {error && <div className="notice notice-error">{error}</div>}
+
+      {error && (
+        <div className="rounded-[24px] border border-[rgba(220,72,72,0.24)] bg-[rgba(255,240,240,0.92)] p-4 text-sm text-[#b94a4a]">
+          {error}
+        </div>
+      )}
       {lastTx && (
-        <div className="notice notice-success">
-          Last tx: <span className="mono">{lastTx}</span>
+        <div className="rounded-[24px] border border-[rgba(108,198,58,0.24)] bg-[rgba(145,216,79,0.08)] p-4 text-sm text-[var(--text)]">
+          Last tx: <span className="font-mono break-all">{lastTx}</span>
         </div>
       )}
     </div>

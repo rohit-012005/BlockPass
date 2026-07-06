@@ -3,6 +3,7 @@ import { serverListBuyerTickets, serverGetTicket } from '@/lib/server-contract'
 import { jsonError, jsonResponse } from '@/lib/api'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 const QuerySchema = z.object({
   buyer: z.string().regex(/^G[A-Z2-7]{55}$/),

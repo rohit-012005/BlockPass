@@ -29,22 +29,25 @@ export function EventCard({ event }: Props) {
   })()
 
   return (
-    <Link href={`/event/${event.id}`} className="surface" style={{ display: 'block', color: 'inherit' }}>
-      <div className="row" style={{ justifyContent: 'space-between' }}>
+    <Link
+      href={`/event/${event.id}`}
+      className="block rounded-[18px] border-2 border-[rgba(38,31,24,0.18)] bg-[linear-gradient(180deg,rgba(255,255,252,0.96),rgba(249,243,233,0.96))] p-[1.35rem] text-inherit shadow-[6px_6px_0_rgba(34,28,21,0.1)] backdrop-blur-[16px]"
+    >
+      <div className="flex items-center justify-between gap-3">
         {statusTag}
-        <span className="muted">{formatUnixDateTime(event.starts_at)}</span>
+        <span className="text-[rgba(25,21,18,0.72)]">{formatUnixDateTime(event.starts_at)}</span>
       </div>
-      <h3 className="h3" style={{ marginTop: '0.5rem' }}>{event.title}</h3>
-      <p className="muted" style={{ margin: 0 }}>{event.venue}</p>
-      <div className="stack" style={{ marginTop: '0.75rem' }}>
-        <div className="progress">
-          <div className="progress-fill" style={{ width: `${percent}%` }} />
+      <h3 className="mt-2 text-[1.2rem] font-display tracking-[-0.03em]">{event.title}</h3>
+      <p className="m-0 text-[rgba(25,21,18,0.72)]">{event.venue}</p>
+      <div className="mt-3 grid gap-3">
+        <div className="h-[10px] overflow-hidden rounded-full border border-[rgba(38,31,24,0.18)] bg-[rgba(255,255,255,0.03)]">
+          <div className="h-full bg-[linear-gradient(90deg,#bce97a,#f3b175)] transition-[width] duration-300" style={{ width: `${percent}%` }} />
         </div>
-        <div className="row" style={{ justifyContent: 'space-between' }}>
-          <span className="muted">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[rgba(25,21,18,0.72)]">
             {sold} of {capacity} sold
           </span>
-          <span className="mono">
+          <span className="font-mono text-[0.9rem]">
             {formatTokenAmount(event.price, 7)} XLM
           </span>
         </div>

@@ -1,13 +1,13 @@
-import { NextResponse } from 'next/server'
-
 const NO_STORE_HEADERS = {
   'Cache-Control': 'no-store, max-age=0',
 } as const
 
 export function jsonResponse<T>(body: T, init?: ResponseInit) {
-  return NextResponse.json(body, {
+  const json = JSON.stringify(body, (_key, value) => (typeof value === 'bigint' ? value.toString() : value))
+  return new Response(json, {
     ...init,
     headers: {
+      'content-type': 'application/json; charset=utf-8',
       ...NO_STORE_HEADERS,
       ...(init?.headers ?? {}),
     },

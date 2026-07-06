@@ -5,6 +5,7 @@ import { serverGetTicket } from '@/lib/server-contract'
 import { TICKET_STATE } from '@/types'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 const QuerySchema = z.object({
   ticket_id: z.coerce.number().int().positive(),

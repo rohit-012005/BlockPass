@@ -6,6 +6,7 @@ import {
 import { jsonError, jsonResponse } from '@/lib/api'
 
 export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 const QuerySchema = z.object({
   organizer: z.string().regex(/^G[A-Z2-7]{55}$/),
@@ -31,6 +32,8 @@ export async function GET(request: Request) {
     )
     return jsonResponse(filtered)
   } catch (e) {
-    return jsonError(e instanceof Error ? e.message : 'Failed to load events', 500)
+    const message = e instanceof Error ? e.message : 'Failed to load events'
+    console.error('[api/events]', { organizer, error: message })
+    return jsonError(message, 500)
   }
 }

@@ -18,7 +18,7 @@ import {
   TransactionBuilder,
 } from '@stellar/stellar-sdk'
 import type { xdr } from '@stellar/stellar-sdk'
-import { NETWORK } from './stellar'
+import { CONTRACT_ID, NETWORK } from './stellar'
 import type { EventRecord, EventStats, TicketRecord } from '@/types'
 import { CONTRACT_ERRORS } from '@/types'
 
@@ -26,7 +26,7 @@ const RPC_URL = process.env.NEXT_PUBLIC_STELLAR_RPC_URL ?? NETWORK.rpcUrl
 const PASSPHRASE = process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE ?? NETWORK.networkPassphrase
 
 function readContractId(): string {
-  const id = process.env.NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID
+  const id = process.env.NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID ?? CONTRACT_ID
   if (!id) {
     throw new Error('NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID is not set on the server.')
   }
@@ -35,6 +35,10 @@ function readContractId(): string {
 
 function server(): rpc.Server {
   return new rpc.Server(RPC_URL, { allowHttp: false })
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 function toNumber(value: unknown): number {
@@ -140,14 +144,19 @@ function scvAddress(addr: string): xdr.ScVal {
 }
 
 export async function serverGetEvent(eventId: number): Promise<EventRecord | null> {
-  try {
-    return await simulateRead('get_event', [scvU64(eventId)], (raw) =>
-      parseEvent(raw as Record<string, unknown>),
-    )
-  } catch (error) {
-    if (isNotFound(error)) return null
-    throw error
+  const attempts = 5
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      return await simulateRead('get_event', [scvU64(eventId)], (raw) =>
+        parseEvent(raw as Record<string, unknown>),
+      )
+    } catch (error) {
+      if (!isNotFound(error)) throw error
+      if (attempt === attempts - 1) return null
+      await sleep(250 * (attempt + 1))
+    }
   }
+  return null
 }
 
 export async function serverGetTicket(ticketId: number): Promise<TicketRecord | null> {
@@ -167,6 +176,19 @@ export async function serverGetEventStats(eventId: number): Promise<EventStats |
       parseStats(raw as Record<string, unknown>),
     )
   } catch (error) {
+    if (isMissingEventTickets(error)) {
+      const event = await serverGetEvent(eventId)
+      if (!event) return null
+      const active = Math.max(0, event.sold - event.refunded)
+      return {
+        sold: event.sold,
+        refunded: event.refunded,
+        checked_in: 0,
+        capacity: event.capacity,
+        status: event.status,
+        collected: BigInt(active) * event.price,
+      }
+    }
     if (isNotFound(error)) return null
     throw error
   }
@@ -201,6 +223,13 @@ function isNotFound(error: unknown): boolean {
   if (message.includes('TicketNotFound')) return true
   if (message.toLowerCase().includes('contract not found')) return true
   return false
+}
+
+function isMissingEventTickets(error: unknown): boolean {
+  if (!(error instanceof Error)) return false
+  const message = error.message
+  if (!message) return false
+  return message.includes('EventTickets') && message.includes('MissingValue')
 }
 
 export function friendlyContractError(message: string): string {
