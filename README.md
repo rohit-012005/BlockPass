@@ -4,8 +4,8 @@
 
 | Link Type | Placeholder |
 |---|---|
-| Live demo | `https://your-blockpass-demo.vercel.app` |
-| Demo video | `https://drive.google.com/file/d/1M8y0pNC1_RvHA9HEfERPk6d3j2A4XMG4/view?usp=sharing` |
+| Live demo | [`https://your-blockpass-demo.vercel.app` ](https://block-pass-chi.vercel.app/)|
+| Demo video | [`https://drive.google.com/file/d/1M8y0pNC1_RvHA9HEfERPk6d3j2A4XMG4/view?usp=sharing`](https://drive.google.com/file/d/1M8y0pNC1_RvHA9HEfERPk6d3j2A4XMG4/view?usp=sharing) |
 
 BlockPass is a Next.js + Soroban app for event ticketing with escrow, refunds, and QR check-in.
 The product idea came from a simple problem: independent event organizers need a low-cost way to
