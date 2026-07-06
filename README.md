@@ -1,6 +1,11 @@
 # BlockPass
 
-> Collect ticket money for a small event on Stellar. Refund everyone automatically if you cancel.
+## Live Links
+
+| Link Type | Placeholder |
+|---|---|
+| Live demo | `https://your-blockpass-demo.vercel.app` |
+| Demo video | `https://drive.google.com/file/d/1M8y0pNC1_RvHA9HEfERPk6d3j2A4XMG4/view?usp=sharing` |
 
 BlockPass is a Next.js + Soroban app for event ticketing with escrow, refunds, and QR check-in.
 The product idea came from a simple problem: independent event organizers need a low-cost way to
@@ -160,14 +165,7 @@ The deploy script writes `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=…` to `.env.local`
 | Deployer account | `GAM66NWFLWHLDYEIX7XRJYVQK7MVV7ZFQ2F4IXYCCKAUHY5XR6QGC2LV` |
 | Contract version | `blockpass-0.1.0` |
 
-## Live Links
 
-| Link Type | Placeholder |
-|---|---|
-| Live demo | `https://your-blockpass-demo.vercel.app` |
-| Demo video | `https://loom.com/share/your-demo-video` |
-| GitHub repo | `https://github.com/rohit-012005/BlockPass` |
-| Submission page | `Add your official submission URL here` |
 
 ## Screenshots
 
@@ -192,19 +190,6 @@ The deploy script writes `NEXT_PUBLIC_BLOCKPASS_CONTRACT_ID=…` to `.env.local`
 
 </div>
 
-## Submission Checklist
-
-| Requirement | Status |
-|---|---|
-| Public GitHub repository | Ready |
-| README with architecture and checklist | Ready |
-| 15+ meaningful commits | Ready |
-| Live demo link | Placeholder |
-| Contract deployment address | Ready |
-| Screenshots | Placeholder |
-| Demo video link | Placeholder |
-| Proof of 10+ wallet interactions | Placeholder |
-| Basic user feedback summary | Ready below |
 
 ## User Feedback
 
